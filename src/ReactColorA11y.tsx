@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { colord, extend as extendColord, Colord } from 'colord'
+import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
 import colordA11yPlugin from 'colord/plugins/a11y'
 
@@ -50,17 +50,17 @@ const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLumin
 
 export interface ReactColorA11yProps {
   children: any
-  colorPaletteKey: string
-  requiredContrastRatio: number
-  flipBlackAndWhite: boolean
+  colorPaletteKey?: string
+  requiredContrastRatio?: number
+  flipBlackAndWhite?: boolean
 }
 
-function ReactColorA11y ({
+const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   children,
-  colorPaletteKey,
-  requiredContrastRatio,
-  flipBlackAndWhite
-}: ReactColorA11yProps): JSX.Element {
+  colorPaletteKey = 'default',
+  requiredContrastRatio = 4.5,
+  flipBlackAndWhite = false
+}: ReactColorA11yProps) => {
   const reactColorA11yRef = useRef(null)
 
   const calculateA11yColor = useCallback((originalColor: string, targetLuminence: TargetLuminence) => {
@@ -136,8 +136,6 @@ function ReactColorA11y ({
   }, [])
 
   useEffect(() => {
-    console.log(reactColorA11yRef)
-
     if (reactColorA11yRef.current === null || reactColorA11yRef.current === undefined) {
       return () => {}
     }
@@ -173,12 +171,6 @@ ReactColorA11y.propTypes = {
   colorPaletteKey: PropTypes.string,
   requiredContrastRatio: PropTypes.number,
   flipBlackAndWhite: PropTypes.bool
-}
-
-ReactColorA11y.defaultProps = {
-  colorPaletteKey: 'default',
-  requiredContrastRatio: 4.5,
-  flipBlackAndWhite: false
 }
 
 export default ReactColorA11y
