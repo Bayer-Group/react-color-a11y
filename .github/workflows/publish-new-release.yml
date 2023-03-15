@@ -1,0 +1,56 @@
+name: Publish New Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://registry.npmjs.org/
+      - run: sudo apt-get install jq
+      - run: jq ".version=\"${GITHUB_REF#refs/*/}\"" package.json > package-new.json && mv package-new.json package.json
+      - run: cat package.json
+      - run: npm i -g pnpm
+      - run: pnpm i
+      - run: pnpm test
+      - run: pnpm publish-npm
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
+
+  deploy-demo:
+    needs: publish-npm
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm i -g pnpm
+      - run: pnpm i
+      - run: pnpm --prefix demo i
+      - run: pnpm --prefix demo un react-color-a11y
+      - run: pnpm --prefix demo i react-color-a11y@latest
+      - name: Set Github identity
+        run: |
+          git config user.email "support+actions@github.com"
+          git config user.name "github-actions-bot"
+      - name: Deploy to Github Pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          pnpm deploy-demo -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
