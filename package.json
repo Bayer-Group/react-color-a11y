@@ -1,6 +1,6 @@
 {
   "name": "react-color-a11y",
-  "version": "0.0.2",
+  "version": "0.0.0",
   "description": "React higher-order component to automatically enforce color accessibility",
   "author": "David Lounsbrough",
   "license": "MIT",

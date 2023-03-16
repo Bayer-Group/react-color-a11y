@@ -26,6 +26,8 @@ describe('ReactColorA11y', () => {
       </div>
     );
 
+    cy.wait(100);
+
     expectedColorMappings.forEach(({ original, lighter }) => {
       cy.contains(`${original} text`).then(($element) => {
         expect($element).to.have.css('color', lighter);
@@ -44,6 +46,8 @@ describe('ReactColorA11y', () => {
       </div>
     );
 
+    cy.wait(100);
+
     expectedColorMappings.forEach(({ original, darker }) => {
       cy.contains(`${original} text`).then(($element) => {
         expect($element).to.have.css('color', darker);
@@ -57,12 +61,14 @@ describe('ReactColorA11y', () => {
         <ReactColorA11y flipBlackAndWhite>
           <svg height={100} width={100}>
             {expectedColorMappings.map(({ original }, index) => (
-              <circle id={index} key={original} cx={50} cy={50} r={50} stroke={original} fill={original} />
+              <circle id={index.toString()} key={original} cx={50} cy={50} r={50} stroke={original} fill={original} />
             ))}
           </svg>
         </ReactColorA11y>
       </div>
     );
+
+    cy.wait(100);
 
     expectedColorMappings.forEach(({ lighter }, index) => {
       cy.get(`#${index}`).then(($element) => {
