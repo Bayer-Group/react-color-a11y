@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, cloneElement } from 'react'
 import PropTypes from 'prop-types'
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
@@ -156,11 +156,9 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }, [reactColorA11yRef, colorPaletteKey])
 
-  return (
-    <div key={colorPaletteKey} ref={reactColorA11yRef}>
-      {children}
-    </div>
-  )
+  return cloneElement(children, {
+    ref: reactColorA11yRef
+  })
 }
 
 ReactColorA11y.propTypes = {
