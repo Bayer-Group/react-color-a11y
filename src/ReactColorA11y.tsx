@@ -157,7 +157,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }, [reactColorA11yRef, colorPaletteKey])
 
   return (
-    <div className="enforce-colors-a11y" key={colorPaletteKey} ref={reactColorA11yRef}>
+    <div key={colorPaletteKey} ref={reactColorA11yRef}>
       {children}
     </div>
   )
