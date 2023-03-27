@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, cloneElement } from 'react'
+import React, { useCallback, useEffect, useRef, cloneElement, isValidElement } from 'react'
 import PropTypes from 'prop-types'
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
@@ -129,6 +129,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }, [])
 
   const enforceColorsRecursively = useCallback((node: Node) => {
+    enforceColorsOnElement(node as HTMLElement);
     node?.childNodes.forEach((childNode) => {
       enforceColorsRecursively(childNode)
       enforceColorsOnElement(childNode as HTMLElement)
@@ -156,9 +157,19 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }, [reactColorA11yRef, colorPaletteKey])
 
-  return cloneElement(children, {
-    ref: reactColorA11yRef
-  })
+  if (!Array.isArray(children) && isValidElement(children)) {
+    return cloneElement(children, {
+      key: colorPaletteKey,
+      // @ts-ignore
+      ref: reactColorA11yRef
+    })
+  }
+
+  return (
+    <div key={colorPaletteKey} ref={reactColorA11yRef}>
+      {children}
+    </div>
+  )
 }
 
 ReactColorA11y.propTypes = {
