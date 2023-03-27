@@ -29,7 +29,7 @@ import ReactColorA11y from 'react-color-a11y'
 const App = () => (
   <ReactColorA11y>
     <div style={{background: '#111', color: '#222'}}>
-      <p>This text is hard to see... 😢</p>
+      <p>This text might be hard to see... 😢</p>
       <p>Never fear, ReactColorA11y will fix it! 🎉</p>
     </div>
   </ReactColorA11y>

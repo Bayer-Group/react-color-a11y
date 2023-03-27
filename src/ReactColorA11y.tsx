@@ -63,7 +63,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
 }: ReactColorA11yProps) => {
   const reactColorA11yRef = useRef(null)
 
-  const calculateA11yColor = useCallback((originalColor: string, targetLuminence: TargetLuminence) => {
+  const calculateA11yColor = (originalColor: string, targetLuminence: TargetLuminence) => {
     const originalColord = colord(originalColor)
 
     if (!originalColord.isValid()) {
@@ -83,9 +83,9 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     const newColord = shiftBrightnessUntilTargetLuminence(originalColord, targetLuminence)
 
     return newColord.toHex()
-  }, [flipBlackAndWhite])
+  }
 
-  const getTargetLuminence = useCallback((backgroundColorLuminence: number): TargetLuminence => {
+  const getTargetLuminence = (backgroundColorLuminence: number): TargetLuminence => {
     const luminenceOffset = 0.05
     // This number represents the intersection of dark and light background contrast ratio curves
     // https://www.w3.org/TR/WCAG20/#contrast-ratiodef
@@ -96,9 +96,9 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       ? { min: requiredContrastRatio * (backgroundColorLuminence + luminenceOffset) - luminenceOffset }
       : { max: (backgroundColorLuminence + luminenceOffset) / requiredContrastRatio - luminenceOffset }
     )
-  }, [requiredContrastRatio])
+  }
 
-  const enforceColorsOnElement = useCallback((element: HTMLElement) => {
+  const enforceColorsOnElement = (element: HTMLElement) => {
     if (element.getAttribute === undefined) {
       return
     }
@@ -126,15 +126,15 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     if (computedColor !== null) {
       element.style.color = calculateA11yColor(computedColor, targetLuminence)
     }
-  }, [])
+  }
 
-  const enforceColorsRecursively = useCallback((node: Node) => {
+  const enforceColorsRecursively = (node: Node) => {
     enforceColorsOnElement(node as HTMLElement);
     node?.childNodes.forEach((childNode) => {
       enforceColorsRecursively(childNode)
       enforceColorsOnElement(childNode as HTMLElement)
     })
-  }, [])
+  }
 
   useEffect(() => {
     if (reactColorA11yRef.current === null || reactColorA11yRef.current === undefined) {
@@ -146,8 +146,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
         enforceColorsRecursively(reactColorA11yRef.current)
       }
     }
+    mutationCallback();
 
-    enforceColorsRecursively(reactColorA11yRef.current)
     const observer = new MutationObserver(mutationCallback)
 
     observer.observe(reactColorA11yRef.current, { childList: true, subtree: true })
@@ -155,7 +155,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     return () => {
       observer.disconnect()
     }
-  }, [reactColorA11yRef, colorPaletteKey])
+  }, [reactColorA11yRef, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
   if (!Array.isArray(children) && isValidElement(children)) {
     return cloneElement(children, {
