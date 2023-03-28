@@ -3,7 +3,14 @@
 [![Publish New Release](https://github.com/Codenough-LLC/react-color-a11y/actions/workflows/publish-new-release.yml/badge.svg)](https://github.com/Codenough-LLC/react-color-a11y/actions/workflows/publish-new-release.yml)
 
 # react-color-a11y
-React higher-order component to automatically enforce color accessibility [https://webaim.org/resources/contrastchecker](https://webaim.org/resources/contrastchecker)
+This is a React higher-order component to automatically enforce color accessibility on given components in your application. This is useful when you are rendering colors in your applications that you don't have direct control over within your application.
+
+For example, if you are rendering an `svg` image that comes from an external source, or some colored text, you may not know ahead of time what those colors will be. This becomes even more of a challenge if your application can switch between light and dark mode.
+
+This wrapper allows you to easily ensure that the content in these components is readable, regardless of what colors come into your application. The live demo gives you a good visual of what that could look like.
+
+More information on contrast and accessibility here:
+[https://webaim.org/resources/contrastchecker](https://webaim.org/resources/contrastchecker)
 
 ## Live Demo
 
@@ -29,7 +36,7 @@ import ReactColorA11y from 'react-color-a11y'
 const App = () => (
   <ReactColorA11y>
     <div style={{background: '#111', color: '#222'}}>
-      <p>This text might be hard to see... 😢</p>
+      <p>This text came from an external source, it may be hard to read... 😢</p>
       <p>Never fear, ReactColorA11y will fix it! 🎉</p>
     </div>
   </ReactColorA11y>
@@ -38,10 +45,22 @@ const App = () => (
 export default App
 ```
 
+## Testing
+If you are unit testing your app with `jest` and `jsdom` you may see errors because of the lack of standard CSS support there. If you wish to make this wrapper transparent to the tests, you can mock it by placing this line in your [jest setup file](https://jestjs.io/docs/configuration#setupfilesafterenv-array):
+
+```js
+jest.mock('react-color-a11y', () => ({ children }) => children);
+```
+
+We are using `cypress` to test the basic functionality of this component, so you should be able to assume that the component works and not test it yourself.
+
+## Multiple Children
+It is recommended to provide a single child component inside `ReactColorA11y`. If you provide multiple children, a `div` will be added around the children so that the color adjustments can be targeted correctly, but this extra element in the DOM could affect your specific styles, so it's preferred to pass only one child.
+
 ## Options
 
-| prop | type | default |
-| ---- | ---- | ------- |
-| colorPaletteKey | string | '' |
-| requiredContrastRatio | number | 4.5 |
-| flipBlackAndWhite | bool | false |
+| prop | type | default | description |
+| ---- | ---- | ------- | ----------- |
+| colorPaletteKey | string | '' | If you are switching between light and dark mode for example, you would want to set this to recompute colors for each state. |
+| requiredContrastRatio | number | 4.5 | This is the contrast Ratio that is required. Depending on the original colors, it may not be able to be reached, but will get as close as possible. https://webaim.org/resources/contrastchecker |
+| flipBlackAndWhite | bool | false | This is an edge case. Should `#000000` be flipped to `#ffffff` when lightening, or should it only lighten as much as it needs to reach the required contrast ratio? Similarly for the opposite case. |

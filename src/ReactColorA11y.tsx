@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, cloneElement, isValidElement } from 'react'
+import React, { useEffect, useRef, cloneElement, isValidElement } from 'react'
 import PropTypes from 'prop-types'
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
@@ -60,10 +60,10 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   colorPaletteKey = 'default',
   requiredContrastRatio = 4.5,
   flipBlackAndWhite = false
-}: ReactColorA11yProps) => {
+}: ReactColorA11yProps): JSX.Element => {
   const reactColorA11yRef = useRef(null)
 
-  const calculateA11yColor = (originalColor: string, targetLuminence: TargetLuminence) => {
+  const calculateA11yColor = (originalColor: string, targetLuminence: TargetLuminence): string => {
     const originalColord = colord(originalColor)
 
     if (!originalColord.isValid()) {
@@ -98,7 +98,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     )
   }
 
-  const enforceColorsOnElement = (element: HTMLElement) => {
+  const enforceColorsOnElement = (element: HTMLElement): void => {
     if (element.getAttribute === undefined) {
       return
     }
@@ -128,9 +128,9 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }
 
-  const enforceColorsRecursively = (node: Node) => {
-    enforceColorsOnElement(node as HTMLElement);
-    node?.childNodes.forEach((childNode) => {
+  const enforceColorsRecursively = (node: Node): void => {
+    enforceColorsOnElement(node as HTMLElement)
+    node?.childNodes?.forEach((childNode) => {
       enforceColorsRecursively(childNode)
       enforceColorsOnElement(childNode as HTMLElement)
     })
@@ -146,7 +146,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
         enforceColorsRecursively(reactColorA11yRef.current)
       }
     }
-    mutationCallback();
+    mutationCallback()
 
     const observer = new MutationObserver(mutationCallback)
 
@@ -158,9 +158,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }, [reactColorA11yRef, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
   if (!Array.isArray(children) && isValidElement(children)) {
-    return cloneElement(children, {
+    return cloneElement(children as React.ReactElement, {
       key: colorPaletteKey,
-      // @ts-ignore
       ref: reactColorA11yRef
     })
   }

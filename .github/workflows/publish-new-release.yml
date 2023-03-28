@@ -42,8 +42,8 @@ jobs:
       - run: npm i -g pnpm
       - run: pnpm i
       - run: pnpm --prefix demo i
-      - run: pnpm --prefix demo un react-color-a11y
-      - run: pnpm --prefix demo i react-color-a11y@latest
+      - run: pnpm --prefix demo unlink ..
+      - run: pnpm --prefix demo i react react-dom react-color-a11y
       - name: Set Github identity
         run: |
           git config user.email "support+actions@github.com"
