@@ -3,7 +3,7 @@
 [![Publish New Release](https://github.com/Codenough-LLC/react-color-a11y/actions/workflows/publish-new-release.yml/badge.svg)](https://github.com/Codenough-LLC/react-color-a11y/actions/workflows/publish-new-release.yml)
 
 # react-color-a11y
-This is a React higher-order component to automatically enforce color accessibility on given components in your application. This is useful when you are rendering colors in your applications that you don't have direct control over within your application.
+This is a React higher-order component to automatically enforce color accessibility on given components in your application. This is useful when you are rendering colors in your application that you don't have direct control over.
 
 For example, if you are rendering an `svg` image that comes from an external source, or some colored text, you may not know ahead of time what those colors will be. This becomes even more of a challenge if your application can switch between light and dark mode.
 
