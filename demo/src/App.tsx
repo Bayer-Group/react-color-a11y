@@ -70,7 +70,7 @@ function App (): JSX.Element {
           </ReactColorA11y>
         </Grid>
       </Grid>
-      <Grid container alignItems="center">
+      <Grid container spacing={2} alignItems="center">
         <Grid xs={12} lg={3}>
           <SettingsBox>
             <Typography gutterBottom>Background Color</Typography>
@@ -101,6 +101,7 @@ function App (): JSX.Element {
         <Grid xs={12} lg={3}>
           <SettingsBox>
             <Typography gutterBottom>Flip Black and White</Typography>
+            <Typography gutterBottom>(only impacts #000 and #fff)</Typography>
             <Switch
               checked={flipBlackAndWhite}
               onChange={flipBlackAndWhiteChangeHandler}
