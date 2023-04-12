@@ -52,7 +52,7 @@ If you are unit testing your app with `jest` and `jsdom` you may see errors beca
 jest.mock('react-color-a11y', () => ({ children }) => children);
 ```
 
-We are using `cypress` to test the basic functionality of this component, so you should be able to assume that the component works and not test it yourself.
+We are using `Cypress` to test the basic functionality of this component, so you should be able to assume that the component works and not test it yourself.
 
 ## Multiple Children
 It is recommended to provide a single child component inside `ReactColorA11y`. If you provide multiple children, a `div` will be added around the children so that the color adjustments can be targeted correctly, but this extra element in the DOM could affect your specific styles, so it's preferred to pass only one child.
