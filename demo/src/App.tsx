@@ -15,6 +15,7 @@ function App (): JSX.Element {
   const [foregroundColor, setForegroundColor] = useState('#333333')
   const [requiredContrastRatio, setRequiredContrastRatio] = useState(4.5)
   const [flipBlackAndWhite, setFlipBlackAndWhite] = useState(false)
+  const [preserveContrastDirectionIfPossible, setPreserveContrastDirectionIfPossible] = useState(true)
 
   const requiredContrastRatioChangeHandler = useCallback((_event: unknown, value: number | number[]) => {
     setRequiredContrastRatio(Number(value))
@@ -22,6 +23,10 @@ function App (): JSX.Element {
 
   const flipBlackAndWhiteChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setFlipBlackAndWhite(event.target.checked)
+  }, [])
+
+  const preserveContrastDirectionIfPossibleChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setPreserveContrastDirectionIfPossible(event.target.checked)
   }, [])
 
   return (
@@ -39,6 +44,7 @@ function App (): JSX.Element {
             colorPaletteKey={Math.random().toString()}
             requiredContrastRatio={requiredContrastRatio}
             flipBlackAndWhite={flipBlackAndWhite}
+            preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
           >
             <div style={{ padding: '20px', background: backgroundColor, color: foregroundColor }}>
               <p>This text might be hard to see... 😢</p>
@@ -61,6 +67,7 @@ function App (): JSX.Element {
             colorPaletteKey={Math.random().toString()}
             requiredContrastRatio={requiredContrastRatio}
             flipBlackAndWhite={flipBlackAndWhite}
+            preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
           >
             <div style={{ padding: '20px', background: backgroundColor, color: foregroundColor }}>
             <svg height={100} width={100}>
@@ -85,7 +92,7 @@ function App (): JSX.Element {
             <HexColorInput alpha color={foregroundColor} onChange={setForegroundColor} />
           </SettingsBox>
         </Grid>
-        <Grid xs={12} lg={3}>
+        <Grid xs={12} lg={2}>
           <SettingsBox>
             <Typography gutterBottom>Required Contrast Ratio</Typography>
             <Slider
@@ -98,13 +105,23 @@ function App (): JSX.Element {
             />
           </SettingsBox>
         </Grid>
-        <Grid xs={12} lg={3}>
+        <Grid xs={12} lg={2}>
           <SettingsBox>
             <Typography gutterBottom>Flip Black and White</Typography>
             <Typography gutterBottom>(only impacts #000 and #fff)</Typography>
             <Switch
               checked={flipBlackAndWhite}
               onChange={flipBlackAndWhiteChangeHandler}
+              inputProps={{ 'aria-label': 'controlled' }}
+            />
+          </SettingsBox>
+        </Grid>
+        <Grid xs={12} lg={2}>
+          <SettingsBox>
+            <Typography gutterBottom>Preserve Contrast Direction If Possible</Typography>
+            <Switch
+              checked={preserveContrastDirectionIfPossible}
+              onChange={preserveContrastDirectionIfPossibleChangeHandler}
               inputProps={{ 'aria-label': 'controlled' }}
             />
           </SettingsBox>
