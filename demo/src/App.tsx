@@ -116,7 +116,7 @@ function App (): JSX.Element {
                 defaultValue={4.5}
                 valueLabelDisplay="auto"
                 step={0.5}
-                min={0}
+                min={1}
                 max={21}
                 onChangeCommitted={requiredContrastRatioChangeHandler}
               />
