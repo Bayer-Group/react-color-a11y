@@ -1,6 +1,6 @@
 [![npm](https://img.shields.io/npm/v/react-color-a11y?logo=npm)](https://www.npmjs.com/package/react-color-a11y)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/react-color-a11y)](https://bundlephobia.com/package/react-color-a11y)
-[![Publish New Release](https://github.com/Codenough-LLC/react-color-a11y/actions/workflows/publish-new-release.yml/badge.svg)](https://github.com/Codenough-LLC/react-color-a11y/actions/workflows/publish-new-release.yml)
+[![Publish New Release](https://github.com/Bayer-Group/react-color-a11y/actions/workflows/publish-new-release.yml/badge.svg)](https://github.com/Bayer-Group/react-color-a11y/actions/workflows/publish-new-release.yml)
 
 # react-color-a11y
 This is a React higher-order component to automatically enforce color accessibility on given components in your application. This is useful when you are rendering colors in your application that you don't have direct control over.
@@ -14,7 +14,7 @@ More information on contrast and accessibility here:
 
 ## Live Demo
 
-https://codenough-llc.github.io/react-color-a11y/
+https://bayer-group.github.io/react-color-a11y/
 
 ## Installation
 

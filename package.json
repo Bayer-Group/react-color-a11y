@@ -4,7 +4,7 @@
   "description": "React higher-order component to automatically enforce color accessibility",
   "author": "David Lounsbrough",
   "license": "MIT",
-  "repository": "Codenough-LLC/react-color-a11y",
+  "repository": "Bayer-Group/react-color-a11y",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
