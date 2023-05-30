@@ -63,7 +63,7 @@ describe('ReactColorA11y', () => {
         <ReactColorA11y flipBlackAndWhite>
           <svg height={100} width={100}>
             {expectedColorMappings.map(({ original }, index) => (
-              <circle id={index.toString()} key={original} cx={50} cy={50} r={50} stroke={original} fill={original} style={{ stroke: original }} />
+              <circle id={index.toString()} key={original} cx={50} cy={50} r={50} stroke={original} fill={original} style={{ stroke: original, fill: original }} />
             ))}
           </svg>
         </ReactColorA11y>
@@ -76,6 +76,7 @@ describe('ReactColorA11y', () => {
       cy.get(`#${index}`).then(($element) => {
         expectColorsToMatch($element.attr('fill'), lighter);
         expectColorsToMatch($element.attr('stroke'), lighter);
+        expectColorsToMatch($element.css('fill'), lighter);
         expectColorsToMatch($element.css('stroke'), lighter);
       });
     });
