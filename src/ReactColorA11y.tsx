@@ -153,9 +153,12 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       element.setAttribute('stroke', calculateA11yColor(backgroundColor, strokeColor))
     }
 
-    const { color: computedColor } = getComputedStyle(element)
+    const { color: computedColor, stroke: computedStroke } = getComputedStyle(element)
     if (computedColor !== null) {
       element.style.color = calculateA11yColor(backgroundColor, computedColor)
+    }
+    if (computedStroke !== null) {
+      element.style.stroke = calculateA11yColor(backgroundColor, computedStroke)
     }
   }
 
