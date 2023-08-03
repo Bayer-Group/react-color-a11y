@@ -73,7 +73,7 @@ describe('ReactColorA11y', () => {
     cy.wait(100);
 
     expectedColorMappings.forEach(({ lighter }, index) => {
-      cy.get(`#${index}`).then(($element) => {
+      cy.get(`#${index}`).then(($element: any) => {
         expectColorsToMatch($element.attr('fill'), lighter);
         expectColorsToMatch($element.attr('stroke'), lighter);
         expectColorsToMatch($element.css('fill'), lighter);
