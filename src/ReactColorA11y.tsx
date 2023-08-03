@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, cloneElement, isValidElement } from 'react'
+import React, { useEffect, useRef, cloneElement, isValidElement, ReactNode } from 'react'
 import PropTypes from 'prop-types'
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
@@ -54,7 +54,7 @@ const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLumin
 }
 
 export interface ReactColorA11yProps {
-  children: any
+  children: ReactNode
   colorPaletteKey?: string
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
