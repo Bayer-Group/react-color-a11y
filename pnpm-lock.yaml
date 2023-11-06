@@ -11,9 +11,6 @@ importers:
       colord:
         specifier: ^2.9.3
         version: 2.9.3
-      prop-types:
-        specifier: ^15.8.1
-        version: 15.8.1
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: ^25.0.3

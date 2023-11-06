@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, cloneElement, isValidElement, ReactNode } from 'react'
-import PropTypes from 'prop-types'
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
 import colordA11yPlugin from 'colord/plugins/a11y'
@@ -206,17 +205,6 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       {children}
     </div>
   )
-}
-
-ReactColorA11y.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
-  ]).isRequired,
-  colorPaletteKey: PropTypes.string,
-  requiredContrastRatio: PropTypes.number,
-  flipBlackAndWhite: PropTypes.bool,
-  preserveContrastDirectionIfPossible: PropTypes.bool
 }
 
 export default ReactColorA11y
