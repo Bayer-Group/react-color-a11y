@@ -152,15 +152,17 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       element.setAttribute('stroke', calculateA11yColor(backgroundColor, strokeColor))
     }
 
-    const { color: computedColor, stroke: computedStroke, fill: computedFill } = getComputedStyle(element)
-    if (computedColor !== null) {
-      element.style.color = calculateA11yColor(backgroundColor, computedColor)
-    }
-    if (computedFill !== null) {
-      element.style.fill = calculateA11yColor(backgroundColor, computedFill)
-    }
-    if (computedStroke !== null) {
-      element.style.stroke = calculateA11yColor(backgroundColor, computedStroke)
+    if (element.style !== undefined) {
+      const { color: computedColor, stroke: computedStroke, fill: computedFill } = getComputedStyle(element)
+      if (computedColor !== null) {
+        element.style.color = calculateA11yColor(backgroundColor, computedColor)
+      }
+      if (computedFill !== null) {
+        element.style.fill = calculateA11yColor(backgroundColor, computedFill)
+      }
+      if (computedStroke !== null) {
+        element.style.stroke = calculateA11yColor(backgroundColor, computedStroke)
+      }
     }
   }
 
@@ -174,7 +176,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
 
   useEffect(() => {
     if (reactColorA11yRef.current === null || reactColorA11yRef.current === undefined) {
-      return () => {}
+      return () => { }
     }
 
     const mutationCallback = (): void => {
