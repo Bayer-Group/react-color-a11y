@@ -1,12 +1,12 @@
 /// <reference types="Cypress" />
 /// <reference types="../cypress/cypress.d.ts" />
 
-import React from 'react';
-import { colord } from 'colord';
-import ReactColorA11y from './ReactColorA11y';
+import React from 'react'
+import { colord } from 'colord'
+import ReactColorA11y from './ReactColorA11y'
 
 const expectColorsToMatch = (color1: string, color2: string) => {
-  expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex());
+  expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex())
 }
 
 describe('ReactColorA11y', () => {
@@ -17,10 +17,10 @@ describe('ReactColorA11y', () => {
     { original: 'rgb(255, 100, 200)', lighter: 'rgb(255, 100, 200)', darker: 'rgb(197, 0, 127)' },
     { original: 'rgb(120, 255, 120)', lighter: 'rgb(120, 255, 120)', darker: 'rgb(0, 120, 0)' },
     { original: 'rgb(255, 255, 255)', lighter: 'rgb(255, 255, 255)', darker: 'rgb(0, 0, 0)' }
-  ];
+  ]
 
-  const lightBackground = 'rgb(230, 230, 230)';
-  const darkBackground = 'rgb(25, 25, 25)';
+  const lightBackground = 'rgb(230, 230, 230)'
+  const darkBackground = 'rgb(25, 25, 25)'
 
   it('should lighten colors until required contrast reached', () => {
     cy.mount(
@@ -31,15 +31,15 @@ describe('ReactColorA11y', () => {
           ))}
         </ReactColorA11y>
       </div>
-    );
+    )
 
-    cy.wait(100);
+    cy.wait(100)
 
     expectedColorMappings.forEach(({ original, lighter }) => {
       cy.contains(`${original} text`).invoke('css', 'color')
-        .then((color: string) => expectColorsToMatch(color, lighter));
-    });
-  });
+        .then((color: string) => expectColorsToMatch(color, lighter))
+    })
+  })
 
   it('should darken colors until required contrast reached', () => {
     cy.mount(
@@ -50,15 +50,15 @@ describe('ReactColorA11y', () => {
           ))}
         </ReactColorA11y>
       </div>
-    );
+    )
 
-    cy.wait(100);
+    cy.wait(100)
 
     expectedColorMappings.forEach(({ original, darker }) => {
       cy.contains(`${original} text`).invoke('css', 'color')
-        .then((color: string) => expectColorsToMatch(color, darker));
-    });
-  });
+        .then((color: string) => expectColorsToMatch(color, darker))
+    })
+  })
 
   it('should handle svg fill and stroke', () => {
     cy.mount(
@@ -71,24 +71,24 @@ describe('ReactColorA11y', () => {
           </svg>
         </ReactColorA11y>
       </div>
-    );
+    )
 
-    cy.wait(100);
+    cy.wait(100)
 
     expectedColorMappings.forEach(({ lighter }, index) => {
       cy.get(`#${index}`).then(($element: any) => {
-        expectColorsToMatch($element.attr('fill'), lighter);
-        expectColorsToMatch($element.attr('stroke'), lighter);
-        expectColorsToMatch($element.css('fill'), lighter);
-        expectColorsToMatch($element.css('stroke'), lighter);
-      });
-    });
-  });
+        expectColorsToMatch($element.attr('fill'), lighter)
+        expectColorsToMatch($element.attr('stroke'), lighter)
+        expectColorsToMatch($element.css('fill'), lighter)
+        expectColorsToMatch($element.css('stroke'), lighter)
+      })
+    })
+  })
 
   describe('preserveContrastDirectionIfPossible', () => {
     describe('lighter starting direction', () => {
-      const backgroundColor = 'rgb(150, 150, 150)';
-      const foregroundColor = 'rgb(151, 151, 151)';
+      const backgroundColor = 'rgb(150, 150, 150)'
+      const foregroundColor = 'rgb(151, 151, 151)'
 
       it('should preserve lighter color if possible', () => {
         cy.mount(
@@ -97,13 +97,13 @@ describe('ReactColorA11y', () => {
               <p style={{ color: foregroundColor }}>{'text'}</p>
             </ReactColorA11y>
           </div>
-        );
+        )
 
-        cy.wait(100);
+        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
-          .then((color: string) => expectColorsToMatch(color, 'rgb(212, 212, 212)'));
-      });
+          .then((color: string) => expectColorsToMatch(color, 'rgb(212, 212, 212)'))
+      })
 
       it('should not preserve lighter color if that behavior is requested', () => {
         cy.mount(
@@ -112,13 +112,13 @@ describe('ReactColorA11y', () => {
               <p style={{ color: foregroundColor }}>{'text'}</p>
             </ReactColorA11y>
           </div>
-        );
+        )
 
-        cy.wait(100);
+        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
-          .then((color: string) => expectColorsToMatch(color, 'rgb(97, 97, 97)'));
-      });
+          .then((color: string) => expectColorsToMatch(color, 'rgb(97, 97, 97)'))
+      })
 
       it('should switch to darker color if needed to meet contrast', () => {
         cy.mount(
@@ -127,18 +127,18 @@ describe('ReactColorA11y', () => {
               <p style={{ color: foregroundColor }}>{'text'}</p>
             </ReactColorA11y>
           </div>
-        );
+        )
 
-        cy.wait(100);
+        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
-          .then((color: string) => expectColorsToMatch(color, 'rgb(41, 41, 41)'));
-      });
-    });
+          .then((color: string) => expectColorsToMatch(color, 'rgb(41, 41, 41)'))
+      })
+    })
 
     describe('darker starting direction', () => {
-      const backgroundColor = 'rgb(100, 100, 100)';
-      const foregroundColor = 'rgb(99, 99, 99)';
+      const backgroundColor = 'rgb(100, 100, 100)'
+      const foregroundColor = 'rgb(99, 99, 99)'
 
       it('should preserve darker color if possible', () => {
         cy.mount(
@@ -147,13 +147,13 @@ describe('ReactColorA11y', () => {
               <p style={{ color: foregroundColor }}>{'text'}</p>
             </ReactColorA11y>
           </div>
-        );
+        )
 
-        cy.wait(100);
+        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
-          .then((color: string) => expectColorsToMatch(color, 'rgb(51, 51, 51)'));
-      });
+          .then((color: string) => expectColorsToMatch(color, 'rgb(51, 51, 51)'))
+      })
 
       it('should not preserve darker color if that behavior is requested', () => {
         cy.mount(
@@ -162,13 +162,13 @@ describe('ReactColorA11y', () => {
               <p style={{ color: foregroundColor }}>{'text'}</p>
             </ReactColorA11y>
           </div>
-        );
+        )
 
-        cy.wait(100);
+        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
-          .then((color: string) => expectColorsToMatch(color, 'rgb(153, 153, 153)'));
-      });
+          .then((color: string) => expectColorsToMatch(color, 'rgb(153, 153, 153)'))
+      })
 
       it('should switch to lighter color if needed to meet contrast', () => {
         cy.mount(
@@ -177,13 +177,13 @@ describe('ReactColorA11y', () => {
               <p style={{ color: foregroundColor }}>{'text'}</p>
             </ReactColorA11y>
           </div>
-        );
+        )
 
-        cy.wait(100);
+        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
-          .then((color: string) => expectColorsToMatch(color, 'rgb(227, 227, 227)'));
-      });
-    });
+          .then((color: string) => expectColorsToMatch(color, 'rgb(227, 227, 227)'))
+      })
+    })
   })
-});
+})
