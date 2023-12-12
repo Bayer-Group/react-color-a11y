@@ -89,13 +89,11 @@ describe('ReactColorA11y', () => {
 
       it('should preserve lighter color if possible', () => {
         cy.mount(
-          <>
-            <div style={{ backgroundColor }}>
-              <ReactColorA11y requiredContrastRatio={2}>
-                <p style={{ color: foregroundColor }}>{'text'}</p>
-              </ReactColorA11y>
-            </div>
-          </>
+          <div style={{ backgroundColor }}>
+            <ReactColorA11y requiredContrastRatio={2}>
+              <p style={{ color: foregroundColor }}>{'text'}</p>
+            </ReactColorA11y>
+          </div>
         );
 
         cy.wait(100);
@@ -106,13 +104,11 @@ describe('ReactColorA11y', () => {
 
       it('should not preserve lighter color if that behavior is requested', () => {
         cy.mount(
-          <>
-            <div style={{ backgroundColor }}>
-              <ReactColorA11y requiredContrastRatio={2} preserveContrastDirectionIfPossible={false}>
-                <p style={{ color: foregroundColor }}>{'text'}</p>
-              </ReactColorA11y>
-            </div>
-          </>
+          <div style={{ backgroundColor }}>
+            <ReactColorA11y requiredContrastRatio={2} preserveContrastDirectionIfPossible={false}>
+              <p style={{ color: foregroundColor }}>{'text'}</p>
+            </ReactColorA11y>
+          </div>
         );
 
         cy.wait(100);
@@ -123,13 +119,11 @@ describe('ReactColorA11y', () => {
 
       it('should switch to darker color if needed to meet contrast', () => {
         cy.mount(
-          <>
-            <div style={{ backgroundColor }}>
-              <ReactColorA11y requiredContrastRatio={4.5}>
-                <p style={{ color: foregroundColor }}>{'text'}</p>
-              </ReactColorA11y>
-            </div>
-          </>
+          <div style={{ backgroundColor }}>
+            <ReactColorA11y requiredContrastRatio={4.5}>
+              <p style={{ color: foregroundColor }}>{'text'}</p>
+            </ReactColorA11y>
+          </div>
         );
 
         cy.wait(100);
@@ -145,13 +139,11 @@ describe('ReactColorA11y', () => {
 
       it('should preserve darker color if possible', () => {
         cy.mount(
-          <>
-            <div style={{ backgroundColor }}>
-              <ReactColorA11y requiredContrastRatio={2}>
-                <p style={{ color: foregroundColor }}>{'text'}</p>
-              </ReactColorA11y>
-            </div>
-          </>
+          <div style={{ backgroundColor }}>
+            <ReactColorA11y requiredContrastRatio={2}>
+              <p style={{ color: foregroundColor }}>{'text'}</p>
+            </ReactColorA11y>
+          </div>
         );
 
         cy.wait(100);
@@ -162,13 +154,11 @@ describe('ReactColorA11y', () => {
 
       it('should not preserve darker color if that behavior is requested', () => {
         cy.mount(
-          <>
-            <div style={{ backgroundColor }}>
-              <ReactColorA11y requiredContrastRatio={2} preserveContrastDirectionIfPossible={false}>
-                <p style={{ color: foregroundColor }}>{'text'}</p>
-              </ReactColorA11y>
-            </div>
-          </>
+          <div style={{ backgroundColor }}>
+            <ReactColorA11y requiredContrastRatio={2} preserveContrastDirectionIfPossible={false}>
+              <p style={{ color: foregroundColor }}>{'text'}</p>
+            </ReactColorA11y>
+          </div>
         );
 
         cy.wait(100);
@@ -179,13 +169,11 @@ describe('ReactColorA11y', () => {
 
       it('should switch to lighter color if needed to meet contrast', () => {
         cy.mount(
-          <>
-            <div style={{ backgroundColor }}>
-              <ReactColorA11y requiredContrastRatio={4.5}>
-                <p style={{ color: foregroundColor }}>{'text'}</p>
-              </ReactColorA11y>
-            </div>
-          </>
+          <div style={{ backgroundColor }}>
+            <ReactColorA11y requiredContrastRatio={4.5}>
+              <p style={{ color: foregroundColor }}>{'text'}</p>
+            </ReactColorA11y>
+          </div>
         );
 
         cy.wait(100);
