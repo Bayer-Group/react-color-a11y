@@ -1,3 +1,6 @@
+/// <reference types="Cypress" />
+/// <reference types="../cypress/cypress.d.ts" />
+
 import React from 'react';
 import { colord } from 'colord';
 import ReactColorA11y from './ReactColorA11y';
