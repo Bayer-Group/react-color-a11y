@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 /// <reference types="../cypress/cypress.d.ts" />
 
-import React from 'react'
+import React, { createRef } from 'react'
 import { colord } from 'colord'
 import ReactColorA11y from './ReactColorA11y'
 
@@ -33,8 +33,6 @@ describe('ReactColorA11y', () => {
       </div>
     )
 
-    cy.wait(100)
-
     expectedColorMappings.forEach(({ original, lighter }) => {
       cy.contains(`${original} text`).invoke('css', 'color')
         .then((color: string) => expectColorsToMatch(color, lighter))
@@ -51,8 +49,6 @@ describe('ReactColorA11y', () => {
         </ReactColorA11y>
       </div>
     )
-
-    cy.wait(100)
 
     expectedColorMappings.forEach(({ original, darker }) => {
       cy.contains(`${original} text`).invoke('css', 'color')
@@ -72,8 +68,6 @@ describe('ReactColorA11y', () => {
         </ReactColorA11y>
       </div>
     )
-
-    cy.wait(100)
 
     expectedColorMappings.forEach(({ lighter }, index) => {
       cy.get(`#${index}`).then(($element: any) => {
@@ -99,8 +93,6 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.wait(100)
-
         cy.contains('text').invoke('css', 'color')
           .then((color: string) => expectColorsToMatch(color, 'rgb(212, 212, 212)'))
       })
@@ -114,8 +106,6 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.wait(100)
-
         cy.contains('text').invoke('css', 'color')
           .then((color: string) => expectColorsToMatch(color, 'rgb(97, 97, 97)'))
       })
@@ -128,8 +118,6 @@ describe('ReactColorA11y', () => {
             </ReactColorA11y>
           </div>
         )
-
-        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
           .then((color: string) => expectColorsToMatch(color, 'rgb(41, 41, 41)'))
@@ -149,8 +137,6 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.wait(100)
-
         cy.contains('text').invoke('css', 'color')
           .then((color: string) => expectColorsToMatch(color, 'rgb(51, 51, 51)'))
       })
@@ -163,8 +149,6 @@ describe('ReactColorA11y', () => {
             </ReactColorA11y>
           </div>
         )
-
-        cy.wait(100)
 
         cy.contains('text').invoke('css', 'color')
           .then((color: string) => expectColorsToMatch(color, 'rgb(153, 153, 153)'))
@@ -179,11 +163,33 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.wait(100)
-
         cy.contains('text').invoke('css', 'color')
           .then((color: string) => expectColorsToMatch(color, 'rgb(227, 227, 227)'))
       })
+    })
+  })
+
+  describe('ref handling', () => {
+    const backgroundColor = 'rgb(100, 100, 100)'
+    const foregroundColor = 'rgb(99, 99, 99)'
+
+    it('should forward ref from consumer if provided', () => {
+      const consumerRef = createRef<HTMLParagraphElement>()
+
+      expect(consumerRef.current).to.be.null
+
+      cy.mount(
+        <div style={{ backgroundColor }}>
+          <ReactColorA11y>
+            <p ref={consumerRef} style={{ color: foregroundColor }}>{'text'}</p>
+          </ReactColorA11y>
+        </div>
+      ).then(() => {
+        expect(consumerRef.current).to.not.be.null
+      })
+
+      cy.contains('text').invoke('css', 'color')
+        .then((color: string) => expectColorsToMatch(color, 'rgb(227, 227, 227)'))
     })
   })
 })
