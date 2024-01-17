@@ -1,38 +1,22 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+import { colord } from 'colord';
+
+const expectColorsToMatch = (color1: string, color2: string) => {
+  expect(Boolean(color1), 'expected both color to be defined or undefined').to.equal(Boolean(color2));
+  expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex())
+}
+
+Cypress.Commands.addQuery('shouldHaveColor', function (type: 'attr' | 'css', property: string, expectedColor: string) {
+  return ($el: JQuery) => {
+    expect(type).to.be.oneOf(['attr', 'css'])
+
+    if (type === 'attr') {
+      expectColorsToMatch($el.attr(property), expectedColor)
+    } else if (type === 'css') {
+      expectColorsToMatch($el.css(property), expectedColor)
+    }
+
+    return $el
+  }
+})
