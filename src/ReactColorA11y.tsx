@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, cloneElement, isValidElement, ReactNode } from 'react'
+import React, { useEffect, useRef, cloneElement, isValidElement, ReactNode, ReactElement } from 'react'
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
 import colordA11yPlugin from 'colord/plugins/a11y'
@@ -53,7 +53,7 @@ const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLumin
 }
 
 export interface ReactColorA11yProps {
-  children: ReactNode
+  children: ReactNode & { ref?: React.MutableRefObject<null> } | undefined
   colorPaletteKey?: string
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
@@ -67,7 +67,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   flipBlackAndWhite = false,
   preserveContrastDirectionIfPossible = true
 }: ReactColorA11yProps): JSX.Element => {
-  const reactColorA11yRef = useRef(null)
+  const internalRef = useRef(null);
+  const reactColorA11yRef = children?.ref ?? internalRef;
 
   const calculateA11yColor = (backgroundColor: string, originalColor: string): string => {
     const backgroundColord = colord(backgroundColor)
@@ -196,7 +197,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }, [reactColorA11yRef, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
   if (!Array.isArray(children) && isValidElement(children)) {
-    return cloneElement(children as React.ReactElement, {
+    return cloneElement(children as ReactElement, {
       key: colorPaletteKey,
       ref: reactColorA11yRef
     })
