@@ -3,16 +3,16 @@
   "homepage": "https://Bayer-Group.github.io/react-color-a11y",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.11.1",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.0",
-    "@mui/material": "^5.15.0",
-    "@testing-library/jest-dom": "^6.1.5",
+    "@mui/icons-material": "^5.15.5",
+    "@mui/material": "^5.15.5",
+    "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
-    "@testing-library/user-event": "^14.5.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.11",
-    "@types/node": "^20.10.5",
-    "@types/react": "^18.2.45",
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/react-helmet": "^6.1.11",
     "react": "^18.2.0",
@@ -22,7 +22,7 @@
     "react-helmet-async": "^2.0.4",
     "react-scripts": "5.0.1",
     "typescript": "^5.3.3",
-    "web-vitals": "^3.5.0"
+    "web-vitals": "^3.5.1"
   },
   "scripts": {
     "start": "react-scripts start",
