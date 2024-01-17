@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import ReactColorA11y from 'react-color-a11y'
 import {
   Box,
@@ -28,7 +28,9 @@ const SvgContent = ({ fillColor }: { fillColor: string }): JSX.Element => (
   </svg>
 )
 
-function App (): JSX.Element {
+function App(): JSX.Element {
+  const textContentRef = useRef(null);
+  const svgContentRef = useRef(null);
   const [backgroundColor, setBackgroundColor] = useState('#222222')
   const [foregroundColor, setForegroundColor] = useState('#333333')
   const [requiredContrastRatio, setRequiredContrastRatio] = useState(4.5)
@@ -65,7 +67,7 @@ function App (): JSX.Element {
               flipBlackAndWhite={flipBlackAndWhite}
               preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
             >
-              <div style={{ padding: '20px', color: foregroundColor }}>
+              <div ref={textContentRef} style={{ padding: '20px', color: foregroundColor }}>
                 <h3>{'With <ReactColorA11y>'}</h3>
                 <TextContent />
               </div>
@@ -86,7 +88,7 @@ function App (): JSX.Element {
               flipBlackAndWhite={flipBlackAndWhite}
               preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
             >
-              <div>
+              <div ref={svgContentRef}>
                 <SvgContent fillColor={foregroundColor} />
               </div>
             </ReactColorA11y>
