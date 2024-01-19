@@ -177,27 +177,33 @@ describe('ReactColorA11y', () => {
     })
   })
 
+  describe('backgroundColor prop', () => {
+    it('should allow consumer to override background color prop if needed', () => {
+      cy.mount(
+        <div style={{ backgroundColor: 'rgb(0, 0, 0)' }}>
+          <ReactColorA11y backgroundColor='rgb(255, 255, 255)'>
+            <p style={{ color: 'rgb(0, 0, 0)' }}>{'text'}</p>
+          </ReactColorA11y>
+        </div>
+      )
+
+      cy.contains('text').shouldHaveColor('css', 'color', 'rgb(0, 0, 0)')
+    })
+  })
+
   describe('transparency handling', () => {
     it('should consider alpha values when determining effective background', () => {
-      const consumerRef = createRef<HTMLParagraphElement>()
-
-      expect(consumerRef.current).to.be.null
-
       cy.mount(
         <div style={{ backgroundColor: 'rgb(0, 0, 0)' }}>
           <div style={{ backgroundColor: 'rgb(255, 200, 200, 0.05)' }}>
             <div style={{ backgroundColor: 'rgb(200, 255, 200, 0.1)' }}>
               <ReactColorA11y>
-                <p ref={consumerRef} style={{ color: 'rgb(10, 10, 10)' }}>
-                  {'text'}
-                </p>
+                <p style={{ color: 'rgb(10, 10, 10)' }}>{'text'}</p>
               </ReactColorA11y>
             </div>
           </div>
         </div >
-      ).then(() => {
-        expect(consumerRef.current).to.not.be.null
-      })
+      )
 
       cy.contains('text').shouldHaveColor('css', 'color', 'rgb(143, 143, 143)')
     })
