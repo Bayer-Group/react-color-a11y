@@ -84,7 +84,7 @@ export interface ReactColorA11yProps {
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
   preserveContrastDirectionIfPossible?: boolean
-  backgroundColor?: string
+  backgroundColorOverride?: string
 }
 
 const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
@@ -93,7 +93,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   requiredContrastRatio = 4.5,
   flipBlackAndWhite = false,
   preserveContrastDirectionIfPossible = true,
-  backgroundColor
+  backgroundColorOverride
 }: ReactColorA11yProps): JSX.Element => {
   const internalRef = useRef(null)
   const reactColorA11yRef = children?.ref ?? internalRef
@@ -164,8 +164,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       return
     }
 
-    const backgroundColord = backgroundColor
-      ? colord(backgroundColor)
+    const backgroundColord = backgroundColorOverride
+      ? colord(backgroundColorOverride)
       : getEffectiveBackgroundColor(element)
 
     if (backgroundColord === null) {
