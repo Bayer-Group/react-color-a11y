@@ -178,10 +178,10 @@ describe('ReactColorA11y', () => {
   })
 
   describe('backgroundColor prop', () => {
-    it('should allow consumer to override background color prop if needed', () => {
+    it('should allow consumer to override background color if needed', () => {
       cy.mount(
         <div style={{ backgroundColor: 'rgb(0, 0, 0)' }}>
-          <ReactColorA11y backgroundColor='rgb(255, 255, 255)'>
+          <ReactColorA11y backgroundColorOverride='rgb(255, 255, 255)'>
             <p style={{ color: 'rgb(0, 0, 0)' }}>{'text'}</p>
           </ReactColorA11y>
         </div>
