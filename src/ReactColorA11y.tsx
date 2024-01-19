@@ -67,8 +67,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   flipBlackAndWhite = false,
   preserveContrastDirectionIfPossible = true
 }: ReactColorA11yProps): JSX.Element => {
-  const internalRef = useRef(null);
-  const reactColorA11yRef = children?.ref ?? internalRef;
+  const internalRef = useRef(null)
+  const reactColorA11yRef = children?.ref ?? internalRef
 
   const calculateA11yColor = (backgroundColor: string, originalColor: string): string => {
     const backgroundColord = colord(backgroundColor)
@@ -132,8 +132,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     )
   }
 
-  const enforceColorsOnElement = (element: HTMLElement): void => {
-    if (element.getAttribute === undefined) {
+  const enforceColorsOnElement = (element: HTMLElement | null): void => {
+    if (element?.getAttribute === undefined) {
       return
     }
 
@@ -167,7 +167,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }
 
-  const enforceColorsRecursively = (node: Node): void => {
+  const enforceColorsRecursively = (node: Node | null): void => {
     enforceColorsOnElement(node as HTMLElement)
     node?.childNodes?.forEach((childNode) => {
       enforceColorsRecursively(childNode)
@@ -176,25 +176,24 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }
 
   useEffect(() => {
+    enforceColorsRecursively(reactColorA11yRef.current)
+  }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
+
+  useEffect(() => {
     if (reactColorA11yRef.current === null || reactColorA11yRef.current === undefined) {
-      return () => { }
+      return
     }
 
-    const mutationCallback = (): void => {
-      if (reactColorA11yRef.current !== null && reactColorA11yRef.current !== undefined) {
-        enforceColorsRecursively(reactColorA11yRef.current)
-      }
-    }
-    mutationCallback()
+    const observer = new MutationObserver(() => {
+      enforceColorsRecursively(reactColorA11yRef.current)
+    })
 
-    const observer = new MutationObserver(mutationCallback)
+    observer.observe(reactColorA11yRef.current, {
+      childList: true, subtree: true
+    })
 
-    observer.observe(reactColorA11yRef.current, { childList: true, subtree: true })
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [reactColorA11yRef, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
+    return () => { observer.disconnect() }
+  }, [reactColorA11yRef.current])
 
   if (!Array.isArray(children) && isValidElement(children)) {
     return cloneElement(children as ReactElement, {

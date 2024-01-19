@@ -29,8 +29,8 @@ const SvgContent = ({ fillColor }: { fillColor: string }): JSX.Element => (
 )
 
 function App(): JSX.Element {
-  const textContentRef = useRef(null);
-  const svgContentRef = useRef(null);
+  const textContentRef = useRef(null)
+  const svgContentRef = useRef(null)
   const [backgroundColor, setBackgroundColor] = useState('#222222')
   const [foregroundColor, setForegroundColor] = useState('#333333')
   const [requiredContrastRatio, setRequiredContrastRatio] = useState(4.5)

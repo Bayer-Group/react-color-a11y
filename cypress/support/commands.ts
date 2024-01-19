@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
 
-import { colord } from 'colord';
+import { colord } from 'colord'
 
 const expectColorsToMatch = (color1: string, color2: string) => {
-  expect(Boolean(color1), 'expected both color to be defined or undefined').to.equal(Boolean(color2));
+  expect(Boolean(color1), 'expected both color to be defined or undefined').to.equal(Boolean(color2))
   expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex())
 }
 

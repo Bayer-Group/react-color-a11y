@@ -25,7 +25,9 @@ module.exports = {
     'react',
     '@typescript-eslint'
   ],
-  rules: {},
+  rules: {
+    'semi': ['error', 'never']
+  },
   settings: {
     react: {
       version: 'detect'

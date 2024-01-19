@@ -40,7 +40,7 @@ const App = () => (
       <p>Never fear, ReactColorA11y will fix it! 🎉</p>
     </div>
   </ReactColorA11y>
-);
+)
 
 export default App
 ```
@@ -49,7 +49,7 @@ export default App
 If you are unit testing your app with `jest` and `jsdom` you may see errors because of the lack of standard CSS support there. If you wish to make this wrapper transparent to the tests, you can mock it by placing this line in your [jest setup file](https://jestjs.io/docs/configuration#setupfilesafterenv-array):
 
 ```js
-jest.mock('react-color-a11y', () => ({ children }) => children);
+jest.mock('react-color-a11y', () => ({ children }) => children)
 ```
 
 We are using `Cypress` to test the basic functionality of this component, so you should be able to assume that the component works and not test it yourself.
