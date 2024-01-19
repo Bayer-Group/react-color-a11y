@@ -104,14 +104,14 @@ function App(): JSX.Element {
       </Box>
       <Box sx={{ flexGrow: 1, padding: 5 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid xs={12} lg={3}>
+          <Grid xs={12} xl={2} md={3}>
             <SettingsBox>
               <Typography gutterBottom>Background Color</Typography>
               <HexColorPicker style={{ margin: '15px auto' }} color={backgroundColor} onChange={setBackgroundColor} />
               <HexColorInput alpha color={backgroundColor} onChange={setBackgroundColor} />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} lg={3}>
+          <Grid xs={12} xl={2} md={3}>
             <SettingsBox>
               <Typography gutterBottom>Foreground Color</Typography>
               <HexColorPicker style={{ margin: '15px auto' }} color={foregroundColor} onChange={setForegroundColor} />
@@ -152,7 +152,7 @@ function App(): JSX.Element {
               />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} lg={2}>
+          <Grid xs={12} xl={2} md={3}>
             <SettingsBox>
               <Typography gutterBottom>Background Color Override</Typography>
               <Switch
