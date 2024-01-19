@@ -36,6 +36,7 @@ function App(): JSX.Element {
   const [requiredContrastRatio, setRequiredContrastRatio] = useState(4.5)
   const [flipBlackAndWhite, setFlipBlackAndWhite] = useState(false)
   const [preserveContrastDirectionIfPossible, setPreserveContrastDirectionIfPossible] = useState(true)
+  const [backgroundColorOverride, setBackgroundColorOverride] = useState<string | undefined>()
 
   const requiredContrastRatioChangeHandler = useCallback((_event: unknown, value: number | number[]) => {
     setRequiredContrastRatio(Number(value))
@@ -47,6 +48,10 @@ function App(): JSX.Element {
 
   const preserveContrastDirectionIfPossibleChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setPreserveContrastDirectionIfPossible(event.target.checked)
+  }, [])
+
+  const backgroundColorOverrideChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setBackgroundColorOverride(event.target.checked ? '#000000' : undefined)
   }, [])
 
   return (
@@ -66,6 +71,7 @@ function App(): JSX.Element {
               requiredContrastRatio={requiredContrastRatio}
               flipBlackAndWhite={flipBlackAndWhite}
               preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
+              backgroundColorOverride={backgroundColorOverride}
             >
               <div ref={textContentRef} style={{ padding: '20px', color: foregroundColor }}>
                 <h3>{'With <ReactColorA11y>'}</h3>
@@ -87,6 +93,7 @@ function App(): JSX.Element {
               requiredContrastRatio={requiredContrastRatio}
               flipBlackAndWhite={flipBlackAndWhite}
               preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
+              backgroundColorOverride={backgroundColorOverride}
             >
               <div ref={svgContentRef}>
                 <SvgContent fillColor={foregroundColor} />
@@ -97,14 +104,14 @@ function App(): JSX.Element {
       </Box>
       <Box sx={{ flexGrow: 1, padding: 5 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid xs={12} lg={3}>
+          <Grid xs={12} xl={2} md={3}>
             <SettingsBox>
               <Typography gutterBottom>Background Color</Typography>
               <HexColorPicker style={{ margin: '15px auto' }} color={backgroundColor} onChange={setBackgroundColor} />
               <HexColorInput alpha color={backgroundColor} onChange={setBackgroundColor} />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} lg={3}>
+          <Grid xs={12} xl={2} md={3}>
             <SettingsBox>
               <Typography gutterBottom>Foreground Color</Typography>
               <HexColorPicker style={{ margin: '15px auto' }} color={foregroundColor} onChange={setForegroundColor} />
@@ -143,6 +150,22 @@ function App(): JSX.Element {
                 onChange={preserveContrastDirectionIfPossibleChangeHandler}
                 inputProps={{ 'aria-label': 'controlled' }}
               />
+            </SettingsBox>
+          </Grid>
+          <Grid xs={12} xl={2} md={3}>
+            <SettingsBox>
+              <Typography gutterBottom>Background Color Override</Typography>
+              <Switch
+                checked={!!backgroundColorOverride}
+                onChange={backgroundColorOverrideChangeHandler}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+              {backgroundColorOverride && (
+                <>
+                  <HexColorPicker style={{ margin: '15px auto' }} color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
+                  <HexColorInput alpha color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
+                </>
+              )}
             </SettingsBox>
           </Grid>
         </Grid>

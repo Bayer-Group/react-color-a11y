@@ -176,4 +176,36 @@ describe('ReactColorA11y', () => {
       cy.contains('text').shouldHaveColor('css', 'color', 'rgb(227, 227, 227)')
     })
   })
+
+  describe('backgroundColor prop', () => {
+    it('should allow consumer to override background color if needed', () => {
+      cy.mount(
+        <div style={{ backgroundColor: 'rgb(0, 0, 0)' }}>
+          <ReactColorA11y backgroundColorOverride='rgb(255, 255, 255)'>
+            <p style={{ color: 'rgb(0, 0, 0)' }}>{'text'}</p>
+          </ReactColorA11y>
+        </div>
+      )
+
+      cy.contains('text').shouldHaveColor('css', 'color', 'rgb(0, 0, 0)')
+    })
+  })
+
+  describe('transparency handling', () => {
+    it('should consider alpha values when determining effective background', () => {
+      cy.mount(
+        <div style={{ backgroundColor: 'rgb(0, 0, 0)' }}>
+          <div style={{ backgroundColor: 'rgb(255, 200, 200, 0.05)' }}>
+            <div style={{ backgroundColor: 'rgb(200, 255, 200, 0.1)' }}>
+              <ReactColorA11y>
+                <p style={{ color: 'rgb(10, 10, 10)' }}>{'text'}</p>
+              </ReactColorA11y>
+            </div>
+          </div>
+        </div >
+      )
+
+      cy.contains('text').shouldHaveColor('css', 'color', 'rgb(143, 143, 143)')
+    })
+  })
 })
