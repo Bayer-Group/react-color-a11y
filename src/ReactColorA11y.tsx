@@ -2,8 +2,9 @@ import React, { useEffect, useRef, cloneElement, isValidElement, ReactNode, Reac
 import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
 import colordA11yPlugin from 'colord/plugins/a11y'
+import colordMixPlugin from 'colord/plugins/mix'
 
-extendColord([colordNamesPlugin, colordA11yPlugin])
+extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin])
 
 interface TargetLuminence {
   min?: number
@@ -15,23 +16,48 @@ enum LuminanceChangeDirection {
   Darken
 }
 
-const getEffectiveBackgroundColor = (element: Element): string | null => {
-  const backgroundColor = getComputedStyle(element).backgroundColor
+const getBackgroundColordStack = (element: Element) => {
+  const stack = []
+  let currentElement = element
 
-  if ((backgroundColor !== 'rgba(0, 0, 0, 0)') && (backgroundColor !== 'transparent')) {
-    return backgroundColor
+  while (currentElement.parentElement) {
+    const { backgroundColor } = getComputedStyle(currentElement)
+
+    if (backgroundColor) {
+      const currentBackgroundColord = colord(backgroundColor)
+      stack.push(currentBackgroundColord)
+
+      if (currentBackgroundColord.alpha() === 1) {
+        break
+      }
+    }
+
+    currentElement = currentElement.parentElement
   }
 
-  if (element.nodeName === 'body') {
+  return stack
+}
+
+const blendLayeredColors = (colors: Colord[]) => {
+  if (!colors.length) {
     return null
   }
 
-  const { parentElement } = element
-  if (parentElement !== null) {
-    return getEffectiveBackgroundColor(parentElement)
+  let mixedColord = colors.pop()!
+  let nextColord = colors.pop()
+  while (nextColord) {
+    const ratio = nextColord.alpha()
+    if (ratio > 0) {
+      mixedColord = mixedColord.mix(nextColord.alpha(1), ratio)
+    }
+    nextColord = colors.pop()
   }
 
-  return backgroundColor
+  return mixedColord
+}
+
+const getEffectiveBackgroundColor = (element: Element): Colord | null => {
+  return blendLayeredColors(getBackgroundColordStack(element))
 }
 
 const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLuminence: TargetLuminence): Colord => {
@@ -70,8 +96,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   const internalRef = useRef(null)
   const reactColorA11yRef = children?.ref ?? internalRef
 
-  const calculateA11yColor = (backgroundColor: string, originalColor: string): string => {
-    const backgroundColord = colord(backgroundColor)
+  const calculateA11yColor = (backgroundColord: Colord, originalColor: string): string => {
     const originalColord = colord(originalColor)
 
     if (backgroundColord.contrast(originalColord) >= requiredContrastRatio) {
@@ -137,32 +162,32 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       return
     }
 
-    const backgroundColor = getEffectiveBackgroundColor(element)
+    const backgroundColord = getEffectiveBackgroundColor(element)
 
-    if (backgroundColor === null) {
+    if (backgroundColord === null) {
       return
     }
 
     const fillColor = element.getAttribute('fill')
     if (fillColor !== null) {
-      element.setAttribute('fill', calculateA11yColor(backgroundColor, fillColor))
+      element.setAttribute('fill', calculateA11yColor(backgroundColord, fillColor))
     }
 
     const strokeColor = element.getAttribute('stroke')
     if (strokeColor !== null) {
-      element.setAttribute('stroke', calculateA11yColor(backgroundColor, strokeColor))
+      element.setAttribute('stroke', calculateA11yColor(backgroundColord, strokeColor))
     }
 
     if (element.style !== undefined) {
       const { color: computedColor, stroke: computedStroke, fill: computedFill } = getComputedStyle(element)
       if (computedColor !== null) {
-        element.style.color = calculateA11yColor(backgroundColor, computedColor)
+        element.style.color = calculateA11yColor(backgroundColord, computedColor)
       }
       if (computedFill !== null) {
-        element.style.fill = calculateA11yColor(backgroundColor, computedFill)
+        element.style.fill = calculateA11yColor(backgroundColord, computedFill)
       }
       if (computedStroke !== null) {
-        element.style.stroke = calculateA11yColor(backgroundColor, computedStroke)
+        element.style.stroke = calculateA11yColor(backgroundColord, computedStroke)
       }
     }
   }
