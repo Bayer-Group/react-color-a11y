@@ -70,6 +70,39 @@ describe('ReactColorA11y', () => {
     })
   })
 
+  it('should handle svg gradients', () => {
+    const gradientStops = (idPrefix: string) => expectedColorMappings.map(({ original }, index) => (
+      <stop
+        id={`${idPrefix}-${index}`}
+        key={original}
+        offset={`${Math.round(100 * (index + 0.5) / (expectedColorMappings.length))}%`}
+        stopColor={original}
+      />
+    ));
+
+    cy.mount(
+      <div style={{ backgroundColor: darkBackground }}>
+        <ReactColorA11y flipBlackAndWhite>
+          <svg height={200} width={200}>
+            <defs>
+              <linearGradient id="linear-gradient">{gradientStops('linear')}</linearGradient>
+              <radialGradient id="radial-gradient">{gradientStops('radial')}</radialGradient>
+            </defs>
+            <svg>
+              <circle id="linear-circle" cx="50" cy="50" r="50" fill="url('#linear-gradient')" />
+              <circle id="radial-circle" cx="150" cy="150" r="50" fill="url('#radial-gradient')" />
+            </svg>
+          </svg>
+        </ReactColorA11y>
+      </div>
+    )
+
+    expectedColorMappings.forEach(({ lighter }, index) => {
+      cy.get(`#linear-${index}`).shouldHaveColor('attr', 'stop-color', lighter)
+      cy.get(`#radial-${index}`).shouldHaveColor('attr', 'stop-color', lighter)
+    })
+  })
+
   describe('preserveContrastDirectionIfPossible', () => {
     describe('lighter starting direction', () => {
       const backgroundColor = 'rgb(150, 150, 150)'

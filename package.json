@@ -47,13 +47,13 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@types/node": "^20.11.5",
-    "@types/react": "^18.2.48",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.54",
     "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "cypress": "^13.6.3",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "cypress": "^13.6.4",
     "eslint": "^8.56.0",
-    "eslint-config-standard-with-typescript": "^43.0.0",
+    "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
@@ -62,12 +62,12 @@
     "postcss": "^8.4.33",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rollup": "^4.9.5",
+    "rollup": "^4.9.6",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.36.0",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
-    "webpack": "^5.89.0"
+    "webpack": "^5.90.1"
   }
 }
