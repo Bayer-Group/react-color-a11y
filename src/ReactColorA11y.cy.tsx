@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 /// <reference types="../cypress/cypress.d.ts" />
 
-import React, { createRef } from 'react'
+import React, { createRef, useState } from 'react'
 import ReactColorA11y from './ReactColorA11y'
 
 describe('ReactColorA11y', () => {
@@ -78,7 +78,7 @@ describe('ReactColorA11y', () => {
         offset={`${Math.round(100 * (index + 0.5) / (expectedColorMappings.length))}%`}
         stopColor={original}
       />
-    ));
+    ))
 
     cy.mount(
       <div style={{ backgroundColor: darkBackground }}>
@@ -239,6 +239,37 @@ describe('ReactColorA11y', () => {
       )
 
       cy.contains('text').shouldHaveColor('css', 'color', 'rgb(143, 143, 143)')
+    })
+  })
+
+  describe('colorPaletteKey', () => {
+    const TestComponent = () => {
+      const [colorPalette, setColorPalette] = useState('light')
+
+      return (
+        <div style={{ backgroundColor: colorPalette === 'dark' ? darkBackground : lightBackground }}>
+          <button onClick={() => setColorPalette('dark')}>dark mode</button>
+          <ReactColorA11y colorPaletteKey={colorPalette} flipBlackAndWhite>
+            {expectedColorMappings.map(({ original }) => (
+              <p key={original} style={{ color: original }}>{`${original} text`}</p>
+            ))}
+          </ReactColorA11y>
+        </div>
+      )
+    }
+
+    it('should re-evaluate colors if colorPaletteKey prop updates', () => {
+      cy.mount(<TestComponent />)
+
+      expectedColorMappings.forEach(({ original, darker }) => {
+        cy.contains(`${original} text`).shouldHaveColor('css', 'color', darker)
+      })
+
+      cy.contains('dark mode').click()
+
+      expectedColorMappings.forEach(({ original, lighter }) => {
+        cy.contains(`${original} text`).shouldHaveColor('css', 'color', lighter)
+      })
     })
   })
 })

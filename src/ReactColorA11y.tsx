@@ -210,24 +210,25 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }
 
   useEffect(() => {
-    enforceColorsRecursively(reactColorA11yRef.current)
-  }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
-
-  useEffect(() => {
     if (reactColorA11yRef.current === null || reactColorA11yRef.current === undefined) {
-      return
+      return () => { }
     }
 
-    const observer = new MutationObserver(() => {
-      enforceColorsRecursively(reactColorA11yRef.current)
-    })
+    const mutationCallback = (): void => {
+      if (reactColorA11yRef.current !== null && reactColorA11yRef.current !== undefined) {
+        enforceColorsRecursively(reactColorA11yRef.current)
+      }
+    }
 
-    observer.observe(reactColorA11yRef.current, {
-      childList: true, subtree: true
-    })
+    const observer = new MutationObserver(mutationCallback)
 
-    return () => { observer.disconnect() }
-  }, [reactColorA11yRef.current])
+    observer.observe(reactColorA11yRef.current, { childList: true, subtree: true })
+    mutationCallback()
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
   if (!Array.isArray(children) && isValidElement(children)) {
     return cloneElement(children as ReactElement, {
