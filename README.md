@@ -66,3 +66,15 @@ It is recommended to provide a single child component inside `ReactColorA11y`. I
 | flipBlackAndWhite | bool | false | This is an edge case. Should `#000000` be flipped to `#ffffff` when lightening, or should it only lighten as much as it needs to reach the required contrast ratio? Similarly for the opposite case. |
 | preserveContrastDirectionIfPossible | bool | true | Try to preserve original contrast direction. For example, if the original foreground color is lighter than the background, try to lighten the foreground. If the required contrast ratio can not be met by lightening, then darkening may occur as determined by the luminance threshold. |
 | backgroundColorOverride | string | '' | If provided, this color will be used as the effective background color for determining the foreground color. This may be necessary if autodetection of the effective background color is not working, because of absolute positioning, z-index, or other cases where determining this is complex. |
+
+## ignoreColorA11y data attribute
+
+If you have some elements which you need to ignore in the color corrections for accessibility, you can add the data attribute `ignoreColorA11y` to those elements. A trivial example would be:
+```xml
+<div style="background: white">
+  <svg>
+    <rect fill="red"/>
+    <rect fill="white" data-ignore-color-ally=""/>
+  </svg>
+</div>
+```

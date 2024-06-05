@@ -242,6 +242,22 @@ describe('ReactColorA11y', () => {
     })
   })
 
+  describe('ignoreColorA11y attribute', () => {
+    it('should ignore elements which have the ignoreColorA11y data attribute set', () => {
+      cy.mount(
+        <div style={{ backgroundColor: 'rgb(0, 0, 0)' }}>
+          <ReactColorA11y>
+            <p data-ignore-color-a11y style={{ color: 'rgb(10, 10, 10)' }}>{'ignored'}</p>
+            <p style={{ color: 'rgb(0, 50, 100)' }}>{'not ignored'}</p>
+          </ReactColorA11y>
+        </div>
+      )
+
+      cy.contains('ignored').shouldHaveColor('css', 'color', 'rgb(10, 10, 10)')
+      cy.contains('not ignored').shouldHaveColor('css', 'color', 'rgb(0, 114, 228)')
+    })
+  })
+
   describe('colorPaletteKey', () => {
     const TestComponent = () => {
       const [colorPalette, setColorPalette] = useState('light')
