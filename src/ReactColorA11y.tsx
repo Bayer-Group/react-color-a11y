@@ -160,7 +160,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   }
 
   const enforceColorsOnElement = (element: HTMLElement | null): void => {
-    if (element?.getAttribute === undefined) {
+    if (element?.getAttribute === undefined || element.dataset.ignoreColorA11y !== undefined) {
       return
     }
 
