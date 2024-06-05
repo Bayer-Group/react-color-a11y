@@ -74,7 +74,7 @@ If you have some elements which you need to ignore in the color corrections for 
 <div style="background: white">
   <svg>
     <rect fill="red"/>
-    <rect fill="white" data-ignore-color-ally=""/>
+    <rect fill="white" data-ignore-color-a11y=""/>
   </svg>
 </div>
 ```
