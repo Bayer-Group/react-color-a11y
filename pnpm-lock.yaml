@@ -145,8 +145,8 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3
       web-vitals:
-        specifier: ^3.5.2
-        version: 3.5.2
+        specifier: ^4.2.0
+        version: 4.2.0
 
 packages:
 
@@ -12224,8 +12224,8 @@ packages:
       minimalistic-assert: 1.0.1
     dev: false
 
-  /web-vitals@3.5.2:
-    resolution: {integrity: sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==}
+  /web-vitals@4.2.0:
+    resolution: {integrity: sha512-ohj72kbtVWCpKYMxcbJ+xaOBV3En76hW47j52dG+tEGG36LZQgfFw5yHl9xyjmosy3XUMn8d/GBUAy4YPM839w==}
     dev: false
 
   /webidl-conversions@4.0.2:
