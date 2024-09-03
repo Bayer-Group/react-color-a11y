@@ -94,8 +94,8 @@ importers:
         specifier: ^11.11.0
         version: 11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0)
       '@mui/icons-material':
-        specifier: ^5.15.7
-        version: 5.15.7(@mui/material@6.0.1(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.2.54)(react@18.2.0)
+        specifier: ^6.0.2
+        version: 6.0.2(@mui/material@6.0.1(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.2.54)(react@18.2.0)
       '@mui/material':
         specifier: ^6.0.1
         version: 6.0.1(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1268,13 +1268,13 @@ packages:
   '@mui/core-downloads-tracker@6.0.1':
     resolution: {integrity: sha512-TmKkCTwgtwvlFTF1tZzG4lYbi7v6NGweEJwFBZoIWZrkF1OLa0xu4umifmIyd+bVIScsEj//E2AD6bOJbPMOOQ==}
 
-  '@mui/icons-material@5.15.7':
-    resolution: {integrity: sha512-EDAc8TVJGIA/imAvR3u4nANl2W5h3QeHieu2gK7Ypez/nIA55p08tHjf8UrMXEpxCAvfZO6piY9S9uaxETdicA==}
-    engines: {node: '>=12.0.0'}
+  '@mui/icons-material@6.0.2':
+    resolution: {integrity: sha512-WaTPSvKcx8X7NdWAHzJWDZv+YXvK0MUY8+JI/r4/q2GgIa5RW+n4+08CGX6jB7sWhU1R3zy28NfsDUwwQjOThw==}
+    engines: {node: '>=14.0.0'}
     peerDependencies:
-      '@mui/material': ^5.0.0
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
+      '@mui/material': ^6.0.2
+      '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -8165,9 +8165,9 @@ snapshots:
 
   '@mui/core-downloads-tracker@6.0.1': {}
 
-  '@mui/icons-material@5.15.7(@mui/material@6.0.1(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.2.54)(react@18.2.0)':
+  '@mui/icons-material@6.0.2(@mui/material@6.0.1(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.2.54)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.25.0
       '@mui/material': 6.0.1(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.3(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react@18.2.0))(@types/react@18.2.54)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
     optionalDependencies:
