@@ -5,7 +5,7 @@ import {
   Typography,
   Slider,
   Switch,
-  Unstable_Grid2 as Grid
+  Grid2 as Grid
 } from '@mui/material'
 import { HexColorPicker, HexColorInput } from 'react-colorful'
 import SettingsBox from './SettingsBox'
