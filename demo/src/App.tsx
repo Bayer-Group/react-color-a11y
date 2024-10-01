@@ -5,7 +5,7 @@ import {
   Typography,
   Slider,
   Switch,
-  Unstable_Grid2 as Grid
+  Grid2 as Grid
 } from '@mui/material'
 import { HexColorPicker, HexColorInput } from 'react-colorful'
 import SettingsBox from './SettingsBox'
@@ -58,13 +58,13 @@ function App(): JSX.Element {
     <>
       <Box sx={{ background: backgroundColor, flexGrow: 1, padding: 2 }}>
         <Grid container sx={{ paddingBottom: 2 }}>
-          <Grid xs={12} lg={6} display="flex" justifyContent="center">
+          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
             <div style={{ padding: '20px', color: foregroundColor }}>
               <h3>{'Without <ReactColorA11y>'}</h3>
               <TextContent />
             </div>
           </Grid>
-          <Grid xs={12} lg={6} display="flex" justifyContent="center">
+          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
             <ReactColorA11y
               // For demo only, force re-render every time
               colorPaletteKey={Math.random().toString()}
@@ -81,12 +81,12 @@ function App(): JSX.Element {
           </Grid>
         </Grid>
         <Grid container sx={{ paddingBottom: 2 }}>
-          <Grid xs={12} lg={6} display="flex" justifyContent="center">
+          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
             <div>
               <SvgContent fillColor={foregroundColor} />
             </div>
           </Grid>
-          <Grid xs={12} lg={6} display="flex" justifyContent="center">
+          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
             <ReactColorA11y
               // For demo only, force re-render every time
               colorPaletteKey={Math.random().toString()}
@@ -104,21 +104,21 @@ function App(): JSX.Element {
       </Box>
       <Box sx={{ flexGrow: 1, padding: 5 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid xs={12} xl={2} md={3}>
+          <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Background Color</Typography>
               <HexColorPicker style={{ margin: '15px auto' }} color={backgroundColor} onChange={setBackgroundColor} />
               <HexColorInput alpha color={backgroundColor} onChange={setBackgroundColor} />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} xl={2} md={3}>
+          <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Foreground Color</Typography>
               <HexColorPicker style={{ margin: '15px auto' }} color={foregroundColor} onChange={setForegroundColor} />
               <HexColorInput alpha color={foregroundColor} onChange={setForegroundColor} />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} lg={2}>
+          <Grid size={{ xs: 12, lg: 2 }}>
             <SettingsBox>
               <Typography gutterBottom>Required Contrast Ratio</Typography>
               <Slider
@@ -131,7 +131,7 @@ function App(): JSX.Element {
               />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} lg={2}>
+          <Grid size={{ xs: 12, lg: 2 }}>
             <SettingsBox>
               <Typography gutterBottom>Flip Black and White</Typography>
               <Typography gutterBottom>(only impacts #000 and #fff)</Typography>
@@ -142,7 +142,7 @@ function App(): JSX.Element {
               />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} lg={2}>
+          <Grid size={{ xs: 12, lg: 2 }}>
             <SettingsBox>
               <Typography gutterBottom>Preserve Contrast Direction If Possible</Typography>
               <Switch
@@ -152,7 +152,7 @@ function App(): JSX.Element {
               />
             </SettingsBox>
           </Grid>
-          <Grid xs={12} xl={2} md={3}>
+          <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Background Color Override</Typography>
               <Switch
