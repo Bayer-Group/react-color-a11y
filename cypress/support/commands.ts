@@ -9,7 +9,7 @@ const expectColorsToMatch = (color1: string | undefined, color2: string | undefi
   }
 }
 
-export const shouldHaveColor = function (this: any, type: 'attr' | 'css', property: string, expectedColor: string): ($el: JQuery) => JQuery<HTMLElement> {
+export const shouldHaveColor = function (this: unknown, type: 'attr' | 'css', property: string, expectedColor: string): ($el: JQuery) => JQuery<HTMLElement> {
   return ($el: JQuery) => {
     expect(type).to.be.oneOf(['attr', 'css'])
 
