@@ -9,7 +9,7 @@
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "clean": "rm -rf lib",
