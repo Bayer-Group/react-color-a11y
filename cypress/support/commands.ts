@@ -4,10 +4,12 @@ import { colord } from 'colord'
 
 const expectColorsToMatch = (color1: string | undefined, color2: string | undefined) => {
   expect(Boolean(color1), 'expected both color to be defined or undefined').to.equal(Boolean(color2))
-  expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex())
+  if (color1 && color2) {
+    expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex())
+  }
 }
 
-Cypress.Commands.addQuery('shouldHaveColor', function (type: 'attr' | 'css', property: string, expectedColor: string) {
+export const shouldHaveColor = function (this: unknown, type: 'attr' | 'css', property: string, expectedColor: string): ($el: JQuery) => JQuery<HTMLElement> {
   return ($el: JQuery) => {
     expect(type).to.be.oneOf(['attr', 'css'])
 
@@ -19,4 +21,6 @@ Cypress.Commands.addQuery('shouldHaveColor', function (type: 'attr' | 'css', pro
 
     return $el
   }
-})
+}
+
+Cypress.Commands.addQuery('shouldHaveColor', shouldHaveColor)

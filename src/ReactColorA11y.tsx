@@ -79,7 +79,7 @@ const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLumin
 }
 
 export interface ReactColorA11yProps {
-  children: React.ReactNode & { ref?: React.MutableRefObject<null> } | undefined
+  children: React.ReactNode & { ref?: React.RefObject<null> } | undefined
   colorPaletteKey?: string
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
@@ -94,7 +94,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   flipBlackAndWhite = false,
   preserveContrastDirectionIfPossible = true,
   backgroundColorOverride
-}: ReactColorA11yProps): JSX.Element => {
+}: ReactColorA11yProps): React.JSX.Element => {
   const internalRef = React.useRef(null)
   const reactColorA11yRef = children?.ref ?? internalRef
 
@@ -230,8 +230,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
-  if (!Array.isArray(children) && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement, {
+  if (!Array.isArray(children) && React.isValidElement<{ ref: React.RefObject<null> }>(children)) {
+    return React.cloneElement(children, {
       key: colorPaletteKey,
       ref: reactColorA11yRef
     })

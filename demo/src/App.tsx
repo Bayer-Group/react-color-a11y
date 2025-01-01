@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { JSX, useCallback, useRef, useState } from 'react'
 import ReactColorA11y from 'react-color-a11y'
 import {
   Box,
