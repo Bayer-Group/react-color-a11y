@@ -96,7 +96,10 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   backgroundColorOverride
 }: ReactColorA11yProps): React.JSX.Element => {
   const internalRef = React.useRef(null)
-  const reactColorA11yRef = children?.ref ?? internalRef
+  let reactColorA11yRef = internalRef
+  if (React.isValidElement<{ ref: React.RefObject<null> }>(children)) {
+    reactColorA11yRef = children?.props?.ref
+  }
 
   const calculateA11yColor = (backgroundColord: Colord, originalColor: string): string => {
     const originalColord = colord(originalColor)
