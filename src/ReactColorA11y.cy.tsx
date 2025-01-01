@@ -203,7 +203,9 @@ describe('ReactColorA11y', () => {
           </ReactColorA11y>
         </div>
       ).then(() => {
-        expect(consumerRef.current).to.not.be.null
+        cy.wait(1).then(() => {
+          expect(consumerRef.current).to.not.be.null
+        })
       })
 
       cy.contains('text').shouldHaveColor('css', 'color', 'rgb(227, 227, 227)')
