@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/react-color-a11y/static/js/main.f86b5f1d.js",
+    "main.js": "/react-color-a11y/static/js/main.dcbded90.js",
     "index.html": "/react-color-a11y/index.html",
-    "main.f86b5f1d.js.map": "/react-color-a11y/static/js/main.f86b5f1d.js.map"
+    "main.dcbded90.js.map": "/react-color-a11y/static/js/main.dcbded90.js.map"
   },
   "entrypoints": [
-    "static/js/main.f86b5f1d.js"
+    "static/js/main.dcbded90.js"
   ]
 }
