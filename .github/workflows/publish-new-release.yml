@@ -5,15 +5,26 @@ on:
     types: [created]
 
 jobs:
-  publish-npm:
+  run-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [22.x]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/run-tests
+        with:
+          node-version: ${{ matrix.node-version }}
+
+  publish-npm:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org/
@@ -22,7 +33,6 @@ jobs:
       - run: cat package.json
       - run: npm i -g pnpm
       - run: pnpm i
-      - run: pnpm test
       - run: pnpm publish-npm
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
@@ -35,8 +45,7 @@ jobs:
         node-version: [22.x]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm i -g pnpm
@@ -49,7 +58,8 @@ jobs:
           git config user.name "github-actions-bot"
       - name: Deploy to Github Pages
         run: |
+          pnpm build-demo
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-          pnpm deploy-demo -- -u "github-actions-bot <support+actions@github.com>"
+          npx gh-pages -d demo/build -u "github-actions-bot <support+actions@github.com>"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
