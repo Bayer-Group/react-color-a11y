@@ -75,7 +75,11 @@ const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLumin
       console.warn('Reached maximum iterations while adjusting color luminance!')
       break
     }
-    newColord = newColord.lighten(deltaLuminance / 2)
+    if (deltaLuminance > 0) {
+      newColord = newColord.lighten(deltaLuminance / 2)
+    } else {
+      newColord = newColord.darken(Math.abs(deltaLuminance) / 2)
+    }
   }
 
   return newColord
