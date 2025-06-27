@@ -64,7 +64,7 @@ const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLumin
 
   let iteration = 0
   const maxIterations = 100
-  const tolerance = 0.01
+  const tolerance = 0.02
   let deltaLuminance = Number.POSITIVE_INFINITY
   const target = targetLuminance.min ?? targetLuminance.max
 
