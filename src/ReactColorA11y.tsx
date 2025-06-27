@@ -3,9 +3,8 @@ import { colord, extend as extendColord, type Colord } from 'colord'
 import colordNamesPlugin from 'colord/plugins/names'
 import colordA11yPlugin from 'colord/plugins/a11y'
 import colordMixPlugin from 'colord/plugins/mix'
-import colorLchPlugin from 'colord/plugins/lch';
 
-extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin, colorLchPlugin])
+extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin])
 
 type TargetLuminance = { min: number, max?: never } | { min?: never, max: number };
 
@@ -60,59 +59,27 @@ const getEffectiveBackgroundColor = (element: Element): Colord | null => {
   return blendLayeredColors(getBackgroundColordStack(element))
 }
 
-const findLChLForTargetLuminance = (
-  originalColor: Colord,
-  targetLuminanceValue: number,
-  conditionFn: (currentLum: number, targetLum: number) => boolean,
-  initialBounds: [number, number]
-): Colord => {
-  const tolerance = 0.001
+const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLuminance: TargetLuminance): Colord => {
+  let newColord = originalColord
+
+  let iteration = 0
   const maxIterations = 100
-  let [lowLChL, highLChL] = initialBounds
-  const originalLch = originalColor.toLch()
-  const { c, h } = originalLch
-  let lastValidLChL = originalLch.l
+  const tolerance = 0.01
+  let deltaLuminance = Number.POSITIVE_INFINITY
+  const target = targetLuminance.min ?? targetLuminance.max
 
-  for (let i = 0; i < maxIterations; i++) {
-    if (Math.abs(highLChL - lowLChL) < tolerance) break
-
-    const midLChL = (lowLChL + highLChL) / 2
-
-    const candidateColord = colord({ l: midLChL, c, h })
-    const candidateLuminance = candidateColord.luminance()
-
-    if (conditionFn(candidateLuminance, targetLuminanceValue)) {
-      lastValidLChL = midLChL
-      highLChL = midLChL
-    } else {
-      lowLChL = midLChL
+  while (Math.abs(deltaLuminance) > tolerance) {
+    iteration += 1
+    deltaLuminance = target - newColord.luminance()
+    if (iteration > maxIterations) {
+      console.warn('Reached maximum iterations while adjusting color luminance!')
+      break
     }
+    newColord = newColord.lighten(deltaLuminance / 2)
   }
 
-  return colord({ l: lastValidLChL, c, h })
-};
-
-const shiftBrightnessUntilTargetLuminance = (
-  originalColord: Colord,
-  targetLuminance: TargetLuminance
-): Colord => {
-  const isMinMode = targetLuminance.min !== undefined
-  const targetValue = isMinMode ? targetLuminance.min : targetLuminance.max
-
-  const initialBounds: [number, number] = isMinMode
-    ? [originalColord.toLch().l, 100]
-    : [0, originalColord.toLch().l]
-
-  const condition: (currentLum: number, targetLum: number) => boolean =
-    isMinMode ? (l, t) => l >= t : (l, t) => l <= t
-
-  return findLChLForTargetLuminance(
-    originalColord,
-    targetValue,
-    condition,
-    initialBounds
-  )
-};
+  return newColord
+}
 
 export interface ReactColorA11yProps {
   children: React.ReactNode & { ref?: React.RefObject<null> } | undefined
