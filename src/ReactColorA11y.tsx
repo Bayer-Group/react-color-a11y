@@ -6,15 +6,14 @@ import colordMixPlugin from 'colord/plugins/mix'
 
 extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin])
 
-interface TargetLuminance {
-  min?: number
-  max?: number
-}
+type TargetLuminance = { min: number, max?: never } | { min?: never, max: number };
 
 enum LuminanceChangeDirection {
   Lighten,
   Darken
 }
+
+const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value))
 
 const getBackgroundColordStack = (element: Element) => {
   const stack = []
@@ -63,16 +62,20 @@ const getEffectiveBackgroundColor = (element: Element): Colord | null => {
 const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLuminance: TargetLuminance): Colord => {
   let newColord = originalColord
 
-  const increment = 0.01
+  let iteration = 0
+  const maxIterations = 100
+  const tolerance = 0.01
+  let deltaLuminance = Number.POSITIVE_INFINITY
+  const target = targetLuminance.min ?? targetLuminance.max
 
-  if (targetLuminance.min !== undefined) {
-    while (newColord.luminance() < targetLuminance.min && newColord.brightness() < 0.99) {
-      newColord = newColord.lighten(increment)
+  while (Math.abs(deltaLuminance) > tolerance) {
+    iteration += 1
+    deltaLuminance = target - newColord.luminance()
+    if (iteration > maxIterations) {
+      console.warn('Reached maximum iterations while adjusting color luminance!')
+      break
     }
-  } else if (targetLuminance.max !== undefined) {
-    while (newColord.luminance() > targetLuminance.max && newColord.brightness() > 0.01) {
-      newColord = newColord.darken(increment)
-    }
+    newColord = newColord.lighten(deltaLuminance / 2)
   }
 
   return newColord
@@ -155,8 +158,8 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     const luminanceOffset = 0.05
 
     return (direction === LuminanceChangeDirection.Lighten
-      ? { min: requiredContrastRatio * (backgroundColorLuminance + luminanceOffset) - luminanceOffset }
-      : { max: (backgroundColorLuminance + luminanceOffset) / requiredContrastRatio - luminanceOffset }
+      ? { min: clamp(requiredContrastRatio * (backgroundColorLuminance + luminanceOffset) - luminanceOffset, 0, 1) }
+      : { max: clamp((backgroundColorLuminance + luminanceOffset) / requiredContrastRatio - luminanceOffset, 0, 1) }
     )
   }
 
