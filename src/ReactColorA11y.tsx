@@ -6,7 +6,7 @@ import colordMixPlugin from 'colord/plugins/mix'
 
 extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin])
 
-interface TargetLuminence {
+interface TargetLuminance {
   min?: number
   max?: number
 }
@@ -60,17 +60,17 @@ const getEffectiveBackgroundColor = (element: Element): Colord | null => {
   return blendLayeredColors(getBackgroundColordStack(element))
 }
 
-const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLuminence: TargetLuminence): Colord => {
+const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLuminance: TargetLuminance): Colord => {
   let newColord = originalColord
 
   const increment = 0.01
 
-  if (targetLuminence.min !== undefined) {
-    while (newColord.luminance() < targetLuminence.min && newColord.brightness() < 0.99) {
+  if (targetLuminance.min !== undefined) {
+    while (newColord.luminance() < targetLuminance.min && newColord.brightness() < 0.99) {
       newColord = newColord.lighten(increment)
     }
-  } else if (targetLuminence.max !== undefined) {
-    while (newColord.luminance() > targetLuminence.max && newColord.brightness() > 0.01) {
+  } else if (targetLuminance.max !== undefined) {
+    while (newColord.luminance() > targetLuminance.max && newColord.brightness() > 0.01) {
       newColord = newColord.darken(increment)
     }
   }
@@ -105,20 +105,20 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       return originalColor
     }
 
-    const backgroundColorLuminence = backgroundColord.luminance()
+    const backgroundColorLuminance = backgroundColord.luminance()
     const originalColorLuminance = originalColord.luminance()
 
     // This number represents the intersection of dark and light background contrast ratio curves
     // https://www.w3.org/TR/WCAG20/#contrast-ratiodef
     // (1 + 0.05) / (x + 0.05) = (x + 0.05) / (0 + 0.05)
-    const luminenceDirectionThreshold = 0.179129
+    const luminanceDirectionThreshold = 0.179129
 
-    let direction = backgroundColorLuminence < luminenceDirectionThreshold
+    let direction = backgroundColorLuminance < luminanceDirectionThreshold
       ? LuminanceChangeDirection.Lighten
       : LuminanceChangeDirection.Darken
 
     if (preserveContrastDirectionIfPossible) {
-      if (originalColorLuminance < backgroundColorLuminence) {
+      if (originalColorLuminance < backgroundColorLuminance) {
         if (backgroundColord.contrast(colord('#000000')) >= requiredContrastRatio) {
           direction = LuminanceChangeDirection.Darken
         }
@@ -129,33 +129,34 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       }
     }
 
-    const targetLuminence = getTargetLuminence(backgroundColorLuminence, direction)
+    const targetLuminance = getTargetLuminance(backgroundColorLuminance, direction)
 
     if (!originalColord.isValid()) {
       return originalColor
     }
 
     if (flipBlackAndWhite) {
-      if (targetLuminence.min !== undefined && originalColord.brightness() === 0) {
+      if (targetLuminance.min !== undefined && originalColord.brightness() === 0) {
         return '#ffffff'
       }
 
-      if (targetLuminence.max !== undefined && originalColord.brightness() === 1) {
+      if (targetLuminance.max !== undefined && originalColord.brightness() === 1) {
         return '#000000'
       }
     }
 
-    const newColord = shiftBrightnessUntilTargetLuminence(originalColord, targetLuminence)
+    const newColord = shiftBrightnessUntilTargetLuminance(originalColord, targetLuminance)
 
     return newColord.toHex()
   }
 
-  const getTargetLuminence = (backgroundColorLuminence: number, direction: LuminanceChangeDirection): TargetLuminence => {
-    const luminenceOffset = 0.05
+  // Found from solving for L2 given L1 and contrast ratio: https://www.w3.org/TR/WCAG20/#contrast-ratiodef
+  const getTargetLuminance = (backgroundColorLuminance: number, direction: LuminanceChangeDirection): TargetLuminance => {
+    const luminanceOffset = 0.05
 
     return (direction === LuminanceChangeDirection.Lighten
-      ? { min: requiredContrastRatio * (backgroundColorLuminence + luminenceOffset) - luminenceOffset }
-      : { max: (backgroundColorLuminence + luminenceOffset) / requiredContrastRatio - luminenceOffset }
+      ? { min: requiredContrastRatio * (backgroundColorLuminance + luminanceOffset) - luminanceOffset }
+      : { max: (backgroundColorLuminance + luminanceOffset) / requiredContrastRatio - luminanceOffset }
     )
   }
 
