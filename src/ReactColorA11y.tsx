@@ -81,8 +81,12 @@ const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLumin
   return newColord
 }
 
+type ChildWithRef = React.ReactElement<any, string | React.JSXElementConstructor<any>> & {
+  ref?: React.Ref<HTMLElement>;
+};
+
 export interface ReactColorA11yProps {
-  children: React.ReactNode & { ref?: React.RefObject<null> } | undefined
+  children: ChildWithRef | React.ReactNode
   colorPaletteKey?: string
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
@@ -98,8 +102,10 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   preserveContrastDirectionIfPossible = true,
   backgroundColorOverride
 }: ReactColorA11yProps): React.JSX.Element => {
-  const internalRef = React.useRef(null)
-  const reactColorA11yRef = children?.ref ?? internalRef
+  const internalRef = React.useRef<HTMLDivElement>(null);
+  const childRef = (React.isValidElement(children) && 'ref' in children.props && children.props.ref)
+    ? children.props.ref as React.RefObject<HTMLElement> : null
+  const reactColorA11yRef = childRef ?? internalRef as React.RefObject<any>;
 
   const calculateA11yColor = (backgroundColord: Colord, originalColor: string): string => {
     const originalColord = colord(originalColor)
@@ -234,7 +240,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
-  if (!Array.isArray(children) && React.isValidElement<{ ref: React.RefObject<null> }>(children)) {
+  if (!Array.isArray(children) && React.isValidElement<{ ref: React.RefObject<HTMLElement> }>(children)) {
     return React.cloneElement(children, {
       key: colorPaletteKey,
       ref: reactColorA11yRef
