@@ -6,15 +6,14 @@ import colordMixPlugin from 'colord/plugins/mix'
 
 extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin])
 
-interface TargetLuminence {
-  min?: number
-  max?: number
-}
+type TargetLuminance = { min: number, max?: never } | { min?: never, max: number };
 
 enum LuminanceChangeDirection {
   Lighten,
   Darken
 }
+
+const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value))
 
 const getBackgroundColordStack = (element: Element) => {
   const stack = []
@@ -60,26 +59,38 @@ const getEffectiveBackgroundColor = (element: Element): Colord | null => {
   return blendLayeredColors(getBackgroundColordStack(element))
 }
 
-const shiftBrightnessUntilTargetLuminence = (originalColord: Colord, targetLuminence: TargetLuminence): Colord => {
+const shiftBrightnessUntilTargetLuminance = (originalColord: Colord, targetLuminance: TargetLuminance): Colord => {
   let newColord = originalColord
 
-  const increment = 0.01
+  let iteration = 0
+  const maxIterations = 100
+  const tolerance = 0.02
+  let deltaLuminance = Number.POSITIVE_INFINITY
+  const target = targetLuminance.min ?? targetLuminance.max
 
-  if (targetLuminence.min !== undefined) {
-    while (newColord.luminance() < targetLuminence.min && newColord.brightness() < 0.99) {
-      newColord = newColord.lighten(increment)
+  while (Math.abs(deltaLuminance) > tolerance) {
+    iteration += 1
+    deltaLuminance = target - newColord.luminance()
+    if (iteration > maxIterations) {
+      console.warn('Reached maximum iterations while adjusting color luminance!')
+      break
     }
-  } else if (targetLuminence.max !== undefined) {
-    while (newColord.luminance() > targetLuminence.max && newColord.brightness() > 0.01) {
-      newColord = newColord.darken(increment)
+    if (deltaLuminance > 0) {
+      newColord = newColord.lighten(deltaLuminance / 2)
+    } else {
+      newColord = newColord.darken(Math.abs(deltaLuminance) / 2)
     }
   }
 
   return newColord
 }
 
+type ChildWithRef = React.ReactElement<any, string | React.JSXElementConstructor<any>> & {
+  ref?: React.Ref<HTMLElement>;
+};
+
 export interface ReactColorA11yProps {
-  children: React.ReactNode & { ref?: React.RefObject<null> } | undefined
+  children: ChildWithRef | React.ReactNode
   colorPaletteKey?: string
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
@@ -95,8 +106,10 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   preserveContrastDirectionIfPossible = true,
   backgroundColorOverride
 }: ReactColorA11yProps): React.JSX.Element => {
-  const internalRef = React.useRef(null)
-  const reactColorA11yRef = children?.ref ?? internalRef
+  const internalRef = React.useRef<HTMLDivElement>(null);
+  const childRef = (React.isValidElement(children) && 'ref' in children.props && children.props.ref)
+    ? children.props.ref as React.RefObject<HTMLElement> : null
+  const reactColorA11yRef = childRef ?? internalRef as React.RefObject<any>;
 
   const calculateA11yColor = (backgroundColord: Colord, originalColor: string): string => {
     const originalColord = colord(originalColor)
@@ -105,20 +118,20 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       return originalColor
     }
 
-    const backgroundColorLuminence = backgroundColord.luminance()
+    const backgroundColorLuminance = backgroundColord.luminance()
     const originalColorLuminance = originalColord.luminance()
 
     // This number represents the intersection of dark and light background contrast ratio curves
     // https://www.w3.org/TR/WCAG20/#contrast-ratiodef
     // (1 + 0.05) / (x + 0.05) = (x + 0.05) / (0 + 0.05)
-    const luminenceDirectionThreshold = 0.179129
+    const luminanceDirectionThreshold = 0.179129
 
-    let direction = backgroundColorLuminence < luminenceDirectionThreshold
+    let direction = backgroundColorLuminance < luminanceDirectionThreshold
       ? LuminanceChangeDirection.Lighten
       : LuminanceChangeDirection.Darken
 
     if (preserveContrastDirectionIfPossible) {
-      if (originalColorLuminance < backgroundColorLuminence) {
+      if (originalColorLuminance < backgroundColorLuminance) {
         if (backgroundColord.contrast(colord('#000000')) >= requiredContrastRatio) {
           direction = LuminanceChangeDirection.Darken
         }
@@ -129,33 +142,34 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       }
     }
 
-    const targetLuminence = getTargetLuminence(backgroundColorLuminence, direction)
+    const targetLuminance = getTargetLuminance(backgroundColorLuminance, direction)
 
     if (!originalColord.isValid()) {
       return originalColor
     }
 
     if (flipBlackAndWhite) {
-      if (targetLuminence.min !== undefined && originalColord.brightness() === 0) {
+      if (targetLuminance.min !== undefined && originalColord.brightness() === 0) {
         return '#ffffff'
       }
 
-      if (targetLuminence.max !== undefined && originalColord.brightness() === 1) {
+      if (targetLuminance.max !== undefined && originalColord.brightness() === 1) {
         return '#000000'
       }
     }
 
-    const newColord = shiftBrightnessUntilTargetLuminence(originalColord, targetLuminence)
+    const newColord = shiftBrightnessUntilTargetLuminance(originalColord, targetLuminance)
 
     return newColord.toHex()
   }
 
-  const getTargetLuminence = (backgroundColorLuminence: number, direction: LuminanceChangeDirection): TargetLuminence => {
-    const luminenceOffset = 0.05
+  // Found from solving for L2 given L1 and contrast ratio: https://www.w3.org/TR/WCAG20/#contrast-ratiodef
+  const getTargetLuminance = (backgroundColorLuminance: number, direction: LuminanceChangeDirection): TargetLuminance => {
+    const luminanceOffset = 0.05
 
     return (direction === LuminanceChangeDirection.Lighten
-      ? { min: requiredContrastRatio * (backgroundColorLuminence + luminenceOffset) - luminenceOffset }
-      : { max: (backgroundColorLuminence + luminenceOffset) / requiredContrastRatio - luminenceOffset }
+      ? { min: clamp(requiredContrastRatio * (backgroundColorLuminance + luminanceOffset) - luminanceOffset, 0, 1) }
+      : { max: clamp((backgroundColorLuminance + luminanceOffset) / requiredContrastRatio - luminanceOffset, 0, 1) }
     )
   }
 
@@ -230,7 +244,7 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     }
   }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
 
-  if (!Array.isArray(children) && React.isValidElement<{ ref: React.RefObject<null> }>(children)) {
+  if (!Array.isArray(children) && React.isValidElement<{ ref: React.RefObject<HTMLElement> }>(children)) {
     return React.cloneElement(children, {
       key: colorPaletteKey,
       ref: reactColorA11yRef

@@ -7,10 +7,10 @@ import ReactColorA11y from './ReactColorA11y'
 describe('ReactColorA11y', () => {
   const expectedColorMappings = [
     { original: 'rgb(0, 0, 0)', lighter: 'rgb(255, 255, 255)', darker: 'rgb(0, 0, 0)' },
-    { original: 'rgb(30, 30, 30)', lighter: 'rgb(132, 132, 132)', darker: 'rgb(30, 30, 30)' },
-    { original: 'rgb(18, 52, 86)', lighter: 'rgb(54, 134, 213)', darker: 'rgb(18, 52, 86)' },
-    { original: 'rgb(255, 100, 200)', lighter: 'rgb(255, 100, 200)', darker: 'rgb(197, 0, 127)' },
-    { original: 'rgb(120, 255, 120)', lighter: 'rgb(120, 255, 120)', darker: 'rgb(0, 120, 0)' },
+    { original: 'rgb(30, 30, 30)', lighter: 'rgb(128, 128, 128)', darker: 'rgb(30, 30, 30)' },
+    { original: 'rgb(18, 52, 86)', lighter: 'rgb(50, 131, 212)', darker: 'rgb(18, 52, 86)' },
+    { original: 'rgb(255, 100, 200)', lighter: 'rgb(255, 100, 200)', darker: 'rgb(203, 0, 130)' },
+    { original: 'rgb(120, 255, 120)', lighter: 'rgb(120, 255, 120)', darker: 'rgb(0, 122, 0)' },
     { original: 'rgb(255, 255, 255)', lighter: 'rgb(255, 255, 255)', darker: 'rgb(0, 0, 0)' }
   ]
 
@@ -117,7 +117,7 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(212, 212, 212)')
+        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(211, 211, 211)')
       })
 
       it('should not preserve lighter color if that behavior is requested', () => {
@@ -129,7 +129,7 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(97, 97, 97)')
+        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(101, 101, 101)')
       })
 
       it('should switch to darker color if needed to meet contrast', () => {
@@ -141,12 +141,12 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(41, 41, 41)')
+        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(56, 56, 56)')
       })
     })
 
     describe('darker starting direction', () => {
-      const backgroundColor = 'rgb(100, 100, 100)'
+      const backgroundColor = 'rgb(101, 101, 101)'
       const foregroundColor = 'rgb(99, 99, 99)'
 
       it('should preserve darker color if possible', () => {
@@ -158,7 +158,7 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(51, 51, 51)')
+        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(65, 65, 65)')
       })
 
       it('should not preserve darker color if that behavior is requested', () => {
@@ -170,7 +170,7 @@ describe('ReactColorA11y', () => {
           </div>
         )
 
-        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(153, 153, 153)')
+        cy.contains('text').shouldHaveColor('css', 'color', 'rgb(150, 150, 150)')
       })
 
       it('should switch to lighter color if needed to meet contrast', () => {
@@ -188,7 +188,7 @@ describe('ReactColorA11y', () => {
   })
 
   describe('ref handling', () => {
-    const backgroundColor = 'rgb(100, 100, 100)'
+    const backgroundColor = 'rgb(101, 101, 101)'
     const foregroundColor = 'rgb(99, 99, 99)'
 
     it('should forward ref from consumer if provided', () => {
@@ -240,7 +240,7 @@ describe('ReactColorA11y', () => {
         </div >
       )
 
-      cy.contains('text').shouldHaveColor('css', 'color', 'rgb(143, 143, 143)')
+      cy.contains('text').shouldHaveColor('css', 'color', 'rgb(139, 139, 139)')
     })
   })
 
@@ -256,7 +256,7 @@ describe('ReactColorA11y', () => {
       )
 
       cy.contains('ignored').shouldHaveColor('css', 'color', 'rgb(10, 10, 10)')
-      cy.contains('not ignored').shouldHaveColor('css', 'color', 'rgb(0, 114, 228)')
+      cy.contains('not ignored').shouldHaveColor('css', 'color', 'rgb(0, 112, 222)')
     })
   })
 
