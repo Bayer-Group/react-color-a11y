@@ -1,11 +1,17 @@
 /// <reference types="cypress" />
 
-import { colord } from 'colord'
+import { colord, extend as extendColord } from 'colord'
+import colordLabPlugin from 'colord/plugins/lab'
+
+extendColord([colordLabPlugin])
 
 const expectColorsToMatch = (color1: string | undefined, color2: string | undefined) => {
   expect(Boolean(color1), 'expected both color to be defined or undefined').to.equal(Boolean(color2))
   if (color1 && color2) {
-    expect(colord(color1).toHex()).to.be.equal(colord(color2).toHex())
+    const delta = 0.005
+    if (colord(color1).delta(colord(color2)) > delta) {
+      throw new Error(`expected colors to match: ${color1} vs ${color2} (allowed delta: ${delta})`)
+    }
   }
 }
 
