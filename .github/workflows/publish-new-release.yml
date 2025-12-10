@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   run-tests:
@@ -35,11 +36,10 @@ jobs:
       - run: sudo apt-get install jq
       - run: jq ".version=\"${GITHUB_REF#refs/*/}\"" package.json > package-new.json && mv package-new.json package.json
       - run: cat package.json
+      - run: npm i -g npm@latest
       - run: npm i -g pnpm
       - run: pnpm i
       - run: pnpm publish-npm
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
 
   deploy-demo:
     needs: publish-npm
