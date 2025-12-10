@@ -1,4 +1,4 @@
-import React, { JSX, useCallback, useRef, useState } from 'react'
+import React, { JSX, useRef, useState } from 'react'
 import ReactColorA11y from 'react-color-a11y'
 import {
   Box,
@@ -7,7 +7,7 @@ import {
   Switch,
   Grid
 } from '@mui/material'
-import { HexColorPicker, HexColorInput } from 'react-colorful'
+import { HexAlphaColorPicker, HexColorInput } from 'react-colorful'
 import SettingsBox from './SettingsBox'
 
 const TextContent = (): JSX.Element => (
@@ -37,22 +37,6 @@ function App(): JSX.Element {
   const [flipBlackAndWhite, setFlipBlackAndWhite] = useState(false)
   const [preserveContrastDirectionIfPossible, setPreserveContrastDirectionIfPossible] = useState(true)
   const [backgroundColorOverride, setBackgroundColorOverride] = useState<string | undefined>()
-
-  const requiredContrastRatioChangeHandler = useCallback((_event: unknown, value: number | number[]) => {
-    setRequiredContrastRatio(Number(value))
-  }, [])
-
-  const flipBlackAndWhiteChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setFlipBlackAndWhite(event.target.checked)
-  }, [])
-
-  const preserveContrastDirectionIfPossibleChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setPreserveContrastDirectionIfPossible(event.target.checked)
-  }, [])
-
-  const backgroundColorOverrideChangeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setBackgroundColorOverride(event.target.checked ? '#000000' : undefined)
-  }, [])
 
   return (
     <>
@@ -107,14 +91,14 @@ function App(): JSX.Element {
           <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Background Color</Typography>
-              <HexColorPicker style={{ margin: '15px auto' }} color={backgroundColor} onChange={setBackgroundColor} />
+              <HexAlphaColorPicker style={{ margin: '15px auto' }} color={backgroundColor} onChange={setBackgroundColor} />
               <HexColorInput alpha color={backgroundColor} onChange={setBackgroundColor} />
             </SettingsBox>
           </Grid>
           <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Foreground Color</Typography>
-              <HexColorPicker style={{ margin: '15px auto' }} color={foregroundColor} onChange={setForegroundColor} />
+              <HexAlphaColorPicker style={{ margin: '15px auto' }} color={foregroundColor} onChange={setForegroundColor} />
               <HexColorInput alpha color={foregroundColor} onChange={setForegroundColor} />
             </SettingsBox>
           </Grid>
@@ -122,12 +106,12 @@ function App(): JSX.Element {
             <SettingsBox>
               <Typography gutterBottom>Required Contrast Ratio</Typography>
               <Slider
-                defaultValue={4.5}
+                value={requiredContrastRatio}
                 valueLabelDisplay="auto"
                 step={0.5}
                 min={1}
                 max={21}
-                onChangeCommitted={requiredContrastRatioChangeHandler}
+                onChange={(_event, value) => setRequiredContrastRatio(value)}
               />
             </SettingsBox>
           </Grid>
@@ -137,8 +121,7 @@ function App(): JSX.Element {
               <Typography gutterBottom>(only impacts #000 and #fff)</Typography>
               <Switch
                 checked={flipBlackAndWhite}
-                onChange={flipBlackAndWhiteChangeHandler}
-                inputProps={{ 'aria-label': 'controlled' }}
+                onChange={(_event, checked) => setFlipBlackAndWhite(checked)}
               />
             </SettingsBox>
           </Grid>
@@ -147,8 +130,7 @@ function App(): JSX.Element {
               <Typography gutterBottom>Preserve Contrast Direction If Possible</Typography>
               <Switch
                 checked={preserveContrastDirectionIfPossible}
-                onChange={preserveContrastDirectionIfPossibleChangeHandler}
-                inputProps={{ 'aria-label': 'controlled' }}
+                onChange={(_event, checked) => setPreserveContrastDirectionIfPossible(checked)}
               />
             </SettingsBox>
           </Grid>
@@ -157,12 +139,11 @@ function App(): JSX.Element {
               <Typography gutterBottom>Background Color Override</Typography>
               <Switch
                 checked={!!backgroundColorOverride}
-                onChange={backgroundColorOverrideChangeHandler}
-                inputProps={{ 'aria-label': 'controlled' }}
+                onChange={(_event, checked) => setBackgroundColorOverride(checked ? '#000000' : undefined)}
               />
               {backgroundColorOverride && (
                 <>
-                  <HexColorPicker style={{ margin: '15px auto' }} color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
+                  <HexAlphaColorPicker style={{ margin: '15px auto' }} color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
                   <HexColorInput alpha color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
                 </>
               )}
