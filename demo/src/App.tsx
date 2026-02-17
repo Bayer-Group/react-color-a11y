@@ -1,19 +1,13 @@
-import React, { JSX, useRef, useState } from 'react'
+import React, { JSX, useState } from 'react'
 import ReactColorA11y from 'react-color-a11y'
-import {
-  Box,
-  Typography,
-  Slider,
-  Switch,
-  Grid
-} from '@mui/material'
+import { Box, Typography, Slider, Switch, Grid } from '@mui/material'
 import { HexAlphaColorPicker, HexColorInput } from 'react-colorful'
 import SettingsBox from './SettingsBox'
 
 const TextContent = (): JSX.Element => (
   <>
-    <p>This text might be hard to see... 😢</p>
-    <p>Never fear, ReactColorA11y will fix it! 🎉</p>
+    <h3>This text might be hard to see...</h3>
+    <h3>Never fear, ReactColorA11y will fix it!</h3>
   </>
 )
 
@@ -28,61 +22,86 @@ const SvgContent = ({ fillColor }: { fillColor: string }): JSX.Element => (
   </svg>
 )
 
+const DemoContent = React.forwardRef<
+  HTMLDivElement,
+  { backgroundColor: string; foregroundColor: string }
+>(({ backgroundColor, foregroundColor }, ref) => (
+  <Box
+    ref={ref}
+    sx={{
+      padding: 3,
+      background: backgroundColor,
+      color: foregroundColor,
+    }}
+  >
+    <TextContent />
+    <SvgContent fillColor={foregroundColor} />
+  </Box>
+))
+
 function App(): JSX.Element {
-  const textContentRef = useRef(null)
-  const svgContentRef = useRef(null)
   const [backgroundColor, setBackgroundColor] = useState('#222222')
   const [foregroundColor, setForegroundColor] = useState('#333333')
   const [requiredContrastRatio, setRequiredContrastRatio] = useState(4.5)
   const [flipBlackAndWhite, setFlipBlackAndWhite] = useState(false)
-  const [preserveContrastDirectionIfPossible, setPreserveContrastDirectionIfPossible] = useState(true)
-  const [backgroundColorOverride, setBackgroundColorOverride] = useState<string | undefined>()
+  const [
+    preserveContrastDirectionIfPossible,
+    setPreserveContrastDirectionIfPossible,
+  ] = useState(true)
+  const [backgroundColorOverride, setBackgroundColorOverride] = useState<
+    string | undefined
+  >()
 
   return (
     <>
-      <Box sx={{ background: backgroundColor, flexGrow: 1, padding: 2 }}>
-        <Grid container sx={{ paddingBottom: 2 }}>
-          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
-            <div style={{ padding: '20px', color: foregroundColor }}>
-              <h3>{'Without <ReactColorA11y>'}</h3>
-              <TextContent />
-            </div>
+      <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+        <Grid container>
+          <Grid
+            size={6}
+            display="flex"
+            container
+            direction="column"
+          >
+            <Grid>
+              <Typography variant="h4" fontWeight="bold" my={2}>
+                {'BEFORE'}
+              </Typography>
+            </Grid>
+            <Grid>
+              <DemoContent
+                backgroundColor={backgroundColor}
+                foregroundColor={foregroundColor}
+              />
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
-            <ReactColorA11y
-              // For demo only, force re-render every time
-              colorPaletteKey={Math.random().toString()}
-              requiredContrastRatio={requiredContrastRatio}
-              flipBlackAndWhite={flipBlackAndWhite}
-              preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
-              backgroundColorOverride={backgroundColorOverride}
-            >
-              <div ref={textContentRef} style={{ padding: '20px', color: foregroundColor }}>
-                <h3>{'With <ReactColorA11y>'}</h3>
-                <TextContent />
-              </div>
-            </ReactColorA11y>
-          </Grid>
-        </Grid>
-        <Grid container sx={{ paddingBottom: 2 }}>
-          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
-            <div>
-              <SvgContent fillColor={foregroundColor} />
-            </div>
-          </Grid>
-          <Grid size={{ xs: 12, lg: 6 }} display="flex" justifyContent="center">
-            <ReactColorA11y
-              // For demo only, force re-render every time
-              colorPaletteKey={Math.random().toString()}
-              requiredContrastRatio={requiredContrastRatio}
-              flipBlackAndWhite={flipBlackAndWhite}
-              preserveContrastDirectionIfPossible={preserveContrastDirectionIfPossible}
-              backgroundColorOverride={backgroundColorOverride}
-            >
-              <div ref={svgContentRef}>
-                <SvgContent fillColor={foregroundColor} />
-              </div>
-            </ReactColorA11y>
+          <Grid
+            size={6}
+            display="flex"
+            container
+            direction="column"
+          >
+            <Grid>
+              <Typography variant="h4" fontWeight="bold" my={2}>
+                {'AFTER'}
+              </Typography>
+            </Grid>
+            <Grid>
+              <ReactColorA11y
+                // For demo only, force re-render every time
+                colorPaletteKey={Math.random().toString()}
+                requiredContrastRatio={requiredContrastRatio}
+                flipBlackAndWhite={flipBlackAndWhite}
+                preserveContrastDirectionIfPossible={
+                  preserveContrastDirectionIfPossible
+                }
+                backgroundColorOverride={backgroundColorOverride}
+              >
+                <DemoContent
+                  backgroundColor={backgroundColor}
+                  foregroundColor={foregroundColor}
+                />
+              </ReactColorA11y>
+            </Grid>
           </Grid>
         </Grid>
       </Box>
@@ -91,15 +110,31 @@ function App(): JSX.Element {
           <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Background Color</Typography>
-              <HexAlphaColorPicker style={{ margin: '15px auto' }} color={backgroundColor} onChange={setBackgroundColor} />
-              <HexColorInput alpha color={backgroundColor} onChange={setBackgroundColor} />
+              <HexAlphaColorPicker
+                style={{ margin: '15px auto' }}
+                color={backgroundColor}
+                onChange={setBackgroundColor}
+              />
+              <HexColorInput
+                alpha
+                color={backgroundColor}
+                onChange={setBackgroundColor}
+              />
             </SettingsBox>
           </Grid>
           <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Foreground Color</Typography>
-              <HexAlphaColorPicker style={{ margin: '15px auto' }} color={foregroundColor} onChange={setForegroundColor} />
-              <HexColorInput alpha color={foregroundColor} onChange={setForegroundColor} />
+              <HexAlphaColorPicker
+                style={{ margin: '15px auto' }}
+                color={foregroundColor}
+                onChange={setForegroundColor}
+              />
+              <HexColorInput
+                alpha
+                color={foregroundColor}
+                onChange={setForegroundColor}
+              />
             </SettingsBox>
           </Grid>
           <Grid size={{ xs: 12, lg: 2 }}>
@@ -127,10 +162,14 @@ function App(): JSX.Element {
           </Grid>
           <Grid size={{ xs: 12, lg: 2 }}>
             <SettingsBox>
-              <Typography gutterBottom>Preserve Contrast Direction If Possible</Typography>
+              <Typography gutterBottom>
+                Preserve Contrast Direction If Possible
+              </Typography>
               <Switch
                 checked={preserveContrastDirectionIfPossible}
-                onChange={(_event, checked) => setPreserveContrastDirectionIfPossible(checked)}
+                onChange={(_event, checked) =>
+                  setPreserveContrastDirectionIfPossible(checked)
+                }
               />
             </SettingsBox>
           </Grid>
@@ -139,12 +178,22 @@ function App(): JSX.Element {
               <Typography gutterBottom>Background Color Override</Typography>
               <Switch
                 checked={!!backgroundColorOverride}
-                onChange={(_event, checked) => setBackgroundColorOverride(checked ? '#000000' : undefined)}
+                onChange={(_event, checked) =>
+                  setBackgroundColorOverride(checked ? '#000000' : undefined)
+                }
               />
               {backgroundColorOverride && (
                 <>
-                  <HexAlphaColorPicker style={{ margin: '15px auto' }} color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
-                  <HexColorInput alpha color={backgroundColorOverride} onChange={setBackgroundColorOverride} />
+                  <HexAlphaColorPicker
+                    style={{ margin: '15px auto' }}
+                    color={backgroundColorOverride}
+                    onChange={setBackgroundColorOverride}
+                  />
+                  <HexColorInput
+                    alpha
+                    color={backgroundColorOverride}
+                    onChange={setBackgroundColorOverride}
+                  />
                 </>
               )}
             </SettingsBox>
