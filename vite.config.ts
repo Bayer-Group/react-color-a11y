@@ -5,6 +5,19 @@ import dts from 'vite-plugin-dts'
 
 export default defineConfig({
   plugins: [react(), dts({ include: ['src'], exclude: ['**/*.cy.tsx'] })],
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-dom/client',
+      'react/jsx-runtime',
+      'cypress/react',
+      'colord',
+      'colord/plugins/names',
+      'colord/plugins/a11y',
+      'colord/plugins/mix',
+    ],
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.tsx'),

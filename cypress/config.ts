@@ -1,5 +1,4 @@
 import { defineConfig } from 'cypress'
-import viteConfig from './vite.config'
 
 export default defineConfig({
   allowCypressEnv: false,
@@ -7,7 +6,6 @@ export default defineConfig({
     devServer: {
       framework: 'react',
       bundler: 'vite',
-      viteConfig,
     },
   },
 })
