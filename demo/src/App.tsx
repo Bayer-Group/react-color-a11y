@@ -87,8 +87,6 @@ function App(): JSX.Element {
             </Grid>
             <Grid>
               <ReactColorA11y
-                // For demo only, force re-render every time
-                colorPaletteKey={Math.random().toString()}
                 requiredContrastRatio={requiredContrastRatio}
                 flipBlackAndWhite={flipBlackAndWhite}
                 preserveContrastDirectionIfPossible={

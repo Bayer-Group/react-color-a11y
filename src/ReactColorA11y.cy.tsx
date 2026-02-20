@@ -260,14 +260,14 @@ describe('ReactColorA11y', () => {
     })
   })
 
-  describe('colorPaletteKey', () => {
+  describe('ancestor background change detection', () => {
     const TestComponent = () => {
       const [colorPalette, setColorPalette] = useState('light')
 
       return (
         <div style={{ backgroundColor: colorPalette === 'dark' ? darkBackground : lightBackground }}>
           <button onClick={() => setColorPalette('dark')}>dark mode</button>
-          <ReactColorA11y colorPaletteKey={colorPalette} flipBlackAndWhite>
+          <ReactColorA11y flipBlackAndWhite>
             {expectedColorMappings.map(({ original }) => (
               <p key={original} style={{ color: original }}>{`${original} text`}</p>
             ))}
@@ -276,7 +276,7 @@ describe('ReactColorA11y', () => {
       )
     }
 
-    it('should re-evaluate colors if colorPaletteKey prop updates', () => {
+    it('should re-evaluate colors when ancestor background color changes', () => {
       cy.mount(<TestComponent />)
 
       expectedColorMappings.forEach(({ original, darker }) => {
@@ -288,6 +288,121 @@ describe('ReactColorA11y', () => {
       expectedColorMappings.forEach(({ original, lighter }) => {
         cy.contains(`${original} text`).shouldHaveColor('css', 'color', lighter)
       })
+    })
+  })
+
+  describe('automatic style change detection', () => {
+    it('should re-evaluate colors when inline style is changed directly on DOM', () => {
+      cy.mount(
+        <div style={{ backgroundColor: darkBackground }}>
+          <ReactColorA11y flipBlackAndWhite>
+            <p id="test-direct" style={{ color: 'rgb(0, 0, 0)' }}>{'styled text'}</p>
+          </ReactColorA11y>
+        </div>
+      )
+
+      // Initially black flipped to white on dark background
+      cy.get('#test-direct').shouldHaveColor('css', 'color', 'rgb(255, 255, 255)')
+
+      // Directly modify the DOM inline style
+      cy.get('#test-direct').then(($el) => {
+        $el[0].style.color = 'rgb(255, 100, 200)'
+      })
+
+      // Should detect the change and keep it (already has enough contrast on dark)
+      cy.get('#test-direct').shouldHaveColor('css', 'color', 'rgb(255, 100, 200)')
+    })
+
+    it('should re-evaluate colors when child inline styles change', () => {
+      const TestComponent = () => {
+        const [fgColor, setFgColor] = useState('rgb(0, 0, 0)')
+
+        return (
+          <div style={{ backgroundColor: darkBackground }}>
+            <button style={{ color: 'white' }} onClick={() => setFgColor('rgb(255, 100, 200)')}>change color</button>
+            <ReactColorA11y flipBlackAndWhite>
+              <div>
+                <p style={{ color: fgColor }}>{'styled text'}</p>
+              </div>
+            </ReactColorA11y>
+          </div>
+        )
+      }
+
+      cy.mount(<TestComponent />)
+
+      // rgb(0,0,0) on dark background with flipBlackAndWhite → white
+      cy.contains('styled text').shouldHaveColor('css', 'color', 'rgb(255, 255, 255)')
+
+      cy.contains('change color').click()
+
+      // rgb(255,100,200) on dark background → stays as-is (already has contrast)
+      cy.contains('styled text').shouldHaveColor('css', 'color', 'rgb(255, 100, 200)')
+    })
+
+    it('should re-evaluate colors when SVG fill attribute changes', () => {
+      const TestComponent = () => {
+        const [fillColor, setFillColor] = useState('rgb(255, 255, 255)')
+
+        return (
+          <div style={{ backgroundColor: darkBackground }}>
+            <button style={{ color: 'white' }} onClick={() => setFillColor('rgb(0, 0, 0)')}>change fill</button>
+            <ReactColorA11y flipBlackAndWhite>
+              <svg height={100} width={100}>
+                <circle id="auto-circle" cx={50} cy={50} r={50} fill={fillColor} />
+              </svg>
+            </ReactColorA11y>
+          </div>
+        )
+      }
+
+      cy.mount(<TestComponent />)
+
+      // White fill on dark background → already has contrast
+      cy.get('#auto-circle').shouldHaveColor('attr', 'fill', 'rgb(255, 255, 255)')
+
+      cy.contains('change fill').click()
+
+      // Black fill on dark with flipBlackAndWhite → white
+      cy.get('#auto-circle').shouldHaveColor('attr', 'fill', 'rgb(255, 255, 255)')
+    })
+
+    it('should not lose foreground update after background change (regression)', () => {
+      // Reproduces: fg→color1, bg changes, fg→color2 — the last fg change must not be lost.
+      // Uses high-contrast colors that pass through without adjustment.
+      const TestComponent = () => {
+        const [bg, setBg] = useState('rgb(0, 0, 0)')
+        const [fg, setFg] = useState('rgb(200, 200, 200)')
+
+        return (
+          <div>
+            <button style={{ color: 'white' }} onClick={() => setFg('rgb(255, 255, 255)')}>fg white</button>
+            <button style={{ color: 'white' }} onClick={() => setBg('rgb(255, 255, 255)')}>bg white</button>
+            <button style={{ color: 'white' }} onClick={() => setFg('rgb(0, 0, 0)')}>fg black</button>
+            <ReactColorA11y>
+              <div style={{ backgroundColor: bg }}>
+                <p style={{ color: fg }}>{'test text'}</p>
+              </div>
+            </ReactColorA11y>
+          </div>
+        )
+      }
+
+      cy.mount(<TestComponent />)
+
+      // Initial: light gray on black → already high contrast
+      cy.contains('test text').shouldHaveColor('css', 'color', 'rgb(200, 200, 200)')
+
+      // Step 1: change foreground to white (max contrast on black bg)
+      cy.contains('fg white').click()
+      cy.contains('test text').shouldHaveColor('css', 'color', 'rgb(255, 255, 255)')
+
+      // Step 2: change background to white
+      cy.contains('bg white').click()
+
+      // Step 3: change foreground to black (max contrast on white bg) — must not stay white
+      cy.contains('fg black').click()
+      cy.contains('test text').shouldHaveColor('css', 'color', 'rgb(0, 0, 0)')
     })
   })
 })
