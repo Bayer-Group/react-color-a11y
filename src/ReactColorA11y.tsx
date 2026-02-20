@@ -8,12 +8,52 @@ extendColord([colordNamesPlugin, colordA11yPlugin, colordMixPlugin])
 
 type TargetLuminance = { min: number, max?: never } | { min?: never, max: number };
 
+// Track our CSS inline overrides so we can clear them before re-reading.
+// When we set element.style[prop], it has higher specificity than class-based
+// styles (e.g. MUI sx) and hides subsequent class changes. The two-phase
+// approach clears overrides first, reads true computed values, then re-applies.
+type CssOverrideEntry = { originalInline: string, adjusted: string }
+type CssOverrides = { color?: CssOverrideEntry, fill?: CssOverrideEntry, stroke?: CssOverrideEntry }
+
+// Track original SVG attribute values. React won't re-apply unchanged attrs,
+// so once we overwrite an attribute we need to remember the original.
+type AttrColorEntry = { original: string, enforced: string }
+type AttrColors = { fill?: AttrColorEntry, stroke?: AttrColorEntry, stopColor?: AttrColorEntry }
+
 enum LuminanceChangeDirection {
   Lighten,
   Darken
 }
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value))
+
+const CHILD_OBSERVER_OPTIONS: MutationObserverInit = {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ['style', 'fill', 'stroke', 'stop-color', 'color', 'class']
+}
+
+const ANCESTOR_OBSERVER_OPTIONS: MutationObserverInit = {
+  attributes: true,
+  attributeFilter: ['style', 'class']
+}
+
+const colorsMatch = (a: string, b: string): boolean => {
+  if (a === b) return true
+  const ca = colord(a)
+  const cb = colord(b)
+  return ca.isValid() && cb.isValid() && ca.toHex() === cb.toHex()
+}
+
+const resolveOriginal = (
+  currentValue: string,
+  entry: AttrColorEntry | undefined
+): string => {
+  if (!entry) return currentValue
+  if (!colorsMatch(currentValue, entry.enforced)) return currentValue
+  return entry.original
+}
 
 const getBackgroundColordStack = (element: Element) => {
   const stack = []
@@ -91,7 +131,6 @@ type ChildWithRef = React.ReactElement<any, string | React.JSXElementConstructor
 
 export interface ReactColorA11yProps {
   children: ChildWithRef | React.ReactNode
-  colorPaletteKey?: string
   requiredContrastRatio?: number
   flipBlackAndWhite?: boolean
   preserveContrastDirectionIfPossible?: boolean
@@ -100,19 +139,27 @@ export interface ReactColorA11yProps {
 
 const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
   children,
-  colorPaletteKey = 'default',
   requiredContrastRatio = 4.5,
   flipBlackAndWhite = false,
   preserveContrastDirectionIfPossible = true,
   backgroundColorOverride
 }: ReactColorA11yProps): React.JSX.Element => {
-  const internalRef = React.useRef<HTMLDivElement>(null);
+  const internalRef = React.useRef<HTMLElement>(null);
   const childRef = (React.isValidElement(children) && 'ref' in children.props && children.props.ref)
     ? children.props.ref as React.RefObject<HTMLElement> : null
-  const reactColorA11yRef = childRef ?? internalRef as React.RefObject<any>;
+  const reactColorA11yRef = childRef ?? internalRef as React.RefObject<HTMLElement>;
+
+  const cssOverridesRef = React.useRef(new WeakMap<HTMLElement, CssOverrides>());
+  const attrColorsRef = React.useRef(new WeakMap<HTMLElement, AttrColors>());
+  const observerRef = React.useRef<MutationObserver | null>(null);
+  const enforceRef = React.useRef<(node: Node | null) => void>(() => { });
 
   const calculateA11yColor = (backgroundColord: Colord, originalColor: string): string => {
     const originalColord = colord(originalColor)
+
+    if (!originalColord.isValid()) {
+      return originalColor
+    }
 
     if (backgroundColord.contrast(originalColord) >= requiredContrastRatio) {
       return originalColor
@@ -135,18 +182,12 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
         if (backgroundColord.contrast(colord('#000000')) >= requiredContrastRatio) {
           direction = LuminanceChangeDirection.Darken
         }
-      } else {
-        if (backgroundColord.contrast(colord('#ffffff')) >= requiredContrastRatio) {
-          direction = LuminanceChangeDirection.Lighten
-        }
+      } else if (backgroundColord.contrast(colord('#ffffff')) >= requiredContrastRatio) {
+        direction = LuminanceChangeDirection.Lighten
       }
     }
 
     const targetLuminance = getTargetLuminance(backgroundColorLuminance, direction)
-
-    if (!originalColord.isValid()) {
-      return originalColor
-    }
 
     if (flipBlackAndWhite) {
       if (targetLuminance.min !== undefined && originalColord.brightness() === 0) {
@@ -173,6 +214,37 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
     )
   }
 
+  const ensureAttrColors = (element: HTMLElement): AttrColors => {
+    const map = attrColorsRef.current
+    if (!map.has(element)) map.set(element, {})
+    return map.get(element)!
+  }
+
+  // Phase 1: Clear our CSS inline overrides, restoring original inline values
+  // so getComputedStyle returns the true (class/inherited/user-set) values.
+  // This runs over the entire tree BEFORE Phase 2 to avoid inheritance pollution
+  // (parent override leaking into child's getComputedStyle).
+  const clearCssOverrides = (node: Node | null): void => {
+    const element = node as HTMLElement
+    if (element?.style !== undefined) {
+      const overrides = cssOverridesRef.current.get(element)
+      if (overrides) {
+        for (const prop of ['color', 'fill', 'stroke'] as const) {
+          const entry = overrides[prop]
+          if (entry) {
+            if (colorsMatch(element.style[prop], entry.adjusted)) {
+              // Our override is still in place — restore what was there before
+              element.style[prop] = entry.originalInline
+            }
+            // else: something external changed the inline — leave it
+          }
+        }
+        cssOverridesRef.current.delete(element)
+      }
+    }
+    node?.childNodes?.forEach(child => clearCssOverrides(child))
+  }
+
   const enforceColorsOnElement = (element: HTMLElement | null): void => {
     if (element?.getAttribute === undefined || element.dataset.ignoreColorA11y !== undefined) {
       return
@@ -186,73 +258,117 @@ const ReactColorA11y: React.FunctionComponent<ReactColorA11yProps> = ({
       return
     }
 
-    const fillColor = element.getAttribute('fill')
-    if (fillColor !== null) {
-      element.setAttribute('fill', calculateA11yColor(backgroundColord, fillColor))
+    // --- SVG attributes ---
+    const attrColors = ensureAttrColors(element)
+
+    const enforceAttr = (attr: string, key: keyof AttrColors) => {
+      const value = element.getAttribute(attr)
+      if (value === null) return
+      const original = resolveOriginal(value, attrColors[key])
+      const adjusted = calculateA11yColor(backgroundColord, original)
+      attrColors[key] = { original, enforced: adjusted }
+      if (value !== adjusted) element.setAttribute(attr, adjusted)
     }
 
-    const strokeColor = element.getAttribute('stroke')
-    if (strokeColor !== null) {
-      element.setAttribute('stroke', calculateA11yColor(backgroundColord, strokeColor))
-    }
+    enforceAttr('fill', 'fill')
+    enforceAttr('stroke', 'stroke')
+    enforceAttr('stop-color', 'stopColor')
 
-    const stopColor = element.getAttribute('stop-color')
-    if (stopColor !== null) {
-      element.setAttribute('stop-color', calculateA11yColor(backgroundColord, stopColor))
-    }
-
+    // --- CSS properties ---
+    // Phase 1 has already cleared our previous inline overrides, so
+    // getComputedStyle now reflects the true natural values
     if (element.style !== undefined) {
-      const { color: computedColor, stroke: computedStroke, fill: computedFill } = getComputedStyle(element)
-      if (computedColor !== null) {
-        element.style.color = calculateA11yColor(backgroundColord, computedColor)
+      const overrides: CssOverrides = {}
+
+      for (const prop of ['color', 'fill', 'stroke'] as const) {
+        const computedValue = getComputedStyle(element)[prop]
+        if (!computedValue) continue
+
+        const adjusted = calculateA11yColor(backgroundColord, computedValue)
+        if (computedValue !== adjusted) {
+          overrides[prop] = { originalInline: element.style[prop], adjusted }
+          element.style[prop] = adjusted
+        }
       }
-      if (computedFill !== null) {
-        element.style.fill = calculateA11yColor(backgroundColord, computedFill)
-      }
-      if (computedStroke !== null) {
-        element.style.stroke = calculateA11yColor(backgroundColord, computedStroke)
+
+      if (overrides.color || overrides.fill || overrides.stroke) {
+        cssOverridesRef.current.set(element, overrides)
       }
     }
+  }
+
+  // Phase 2: Walk the tree and enforce colors on each element
+  const applyColorsRecursively = (node: Node | null): void => {
+    enforceColorsOnElement(node as HTMLElement)
+    node?.childNodes?.forEach(childNode => applyColorsRecursively(childNode))
   }
 
   const enforceColorsRecursively = (node: Node | null): void => {
-    enforceColorsOnElement(node as HTMLElement)
-    node?.childNodes?.forEach((childNode) => {
-      enforceColorsRecursively(childNode)
-      enforceColorsOnElement(childNode as HTMLElement)
-    })
+    // Phase 1: Clear our CSS inline overrides so getComputedStyle shows true values
+    clearCssOverrides(node)
+    // Phase 2: Read computed styles and apply new overrides where needed
+    applyColorsRecursively(node)
   }
 
-  React.useEffect(() => {
-    if (reactColorA11yRef.current === null || reactColorA11yRef.current === undefined) {
-      return () => { }
+  // Keep a stable ref to the latest enforcement function so MutationObserver
+  // callbacks always use current prop values without needing to re-subscribe.
+  enforceRef.current = enforceColorsRecursively
+
+  // useLayoutEffect runs synchronously after React's DOM commit but before paint,
+  // ensuring we pick up React-driven style/attribute changes immediately.
+  React.useLayoutEffect(() => {
+    const element = reactColorA11yRef.current
+    if (!element) return
+
+    // Disconnect observer while we enforce to prevent cascading mutations
+    observerRef.current?.disconnect()
+    enforceColorsRecursively(element)
+
+    // Reconnect if the observer was already set up
+    if (observerRef.current) {
+      observerRef.current.observe(element, CHILD_OBSERVER_OPTIONS)
     }
+  })
+
+  React.useEffect(() => {
+    if (!reactColorA11yRef.current) return
+
+    const element = reactColorA11yRef.current
 
     const mutationCallback = (): void => {
-      if (reactColorA11yRef.current !== null && reactColorA11yRef.current !== undefined) {
-        enforceColorsRecursively(reactColorA11yRef.current)
-      }
+      observer.disconnect()
+      enforceRef.current(element)
+      observer.observe(element, CHILD_OBSERVER_OPTIONS)
     }
 
     const observer = new MutationObserver(mutationCallback)
+    observerRef.current = observer
 
-    observer.observe(reactColorA11yRef.current, { childList: true, subtree: true })
-    mutationCallback()
+    observer.observe(element, CHILD_OBSERVER_OPTIONS)
+
+    // Also observe ancestors for style/class changes (e.g. background color switching)
+    const ancestorObserver = new MutationObserver(mutationCallback)
+    let ancestor = element.parentElement
+    while (ancestor) {
+      ancestorObserver.observe(ancestor, ANCESTOR_OBSERVER_OPTIONS)
+      ancestor = ancestor.parentElement
+    }
 
     return () => {
       observer.disconnect()
+      ancestorObserver.disconnect()
+      observerRef.current = null
     }
-  }, [reactColorA11yRef.current, colorPaletteKey, requiredContrastRatio, flipBlackAndWhite])
+  }, [reactColorA11yRef.current])
 
   if (!Array.isArray(children) && React.isValidElement<{ ref: React.RefObject<HTMLElement> }>(children)) {
     return React.cloneElement(children, {
-      key: colorPaletteKey,
       ref: reactColorA11yRef
     })
   }
 
   return (
-    <div key={colorPaletteKey} ref={reactColorA11yRef}>
+    <div ref={reactColorA11yRef as React.RefObject<HTMLDivElement>}>
       {children}
     </div>
   )
