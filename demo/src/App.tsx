@@ -2,7 +2,7 @@ import React, { JSX, useState } from 'react'
 import ReactColorA11y from 'react-color-a11y'
 import { Box, Typography, Slider, Switch, Grid } from '@mui/material'
 import { HexAlphaColorPicker, HexColorInput } from 'react-colorful'
-import SettingsBox from './SettingsBox'
+import SettingsBox from './SettingsBox.tsx'
 
 const TextContent = (): JSX.Element => (
   <>
@@ -58,12 +58,11 @@ function App(): JSX.Element {
         <Grid container>
           <Grid
             size={6}
-            display="flex"
+            sx={{ display: 'flex', flexDirection: 'column' }}
             container
-            direction="column"
           >
             <Grid>
-              <Typography variant="h4" fontWeight="bold" my={2}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', my: 2 }}>
                 {'BEFORE'}
               </Typography>
             </Grid>
@@ -76,12 +75,11 @@ function App(): JSX.Element {
           </Grid>
           <Grid
             size={6}
-            display="flex"
+            sx={{ display: 'flex', flexDirection: 'column' }}
             container
-            direction="column"
           >
             <Grid>
-              <Typography variant="h4" fontWeight="bold" my={2}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', my: 2 }}>
                 {'AFTER'}
               </Typography>
             </Grid>
@@ -104,7 +102,7 @@ function App(): JSX.Element {
         </Grid>
       </Box>
       <Box sx={{ flexGrow: 1, padding: 5 }}>
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
           <Grid size={{ xs: 12, xl: 2, md: 3 }}>
             <SettingsBox>
               <Typography gutterBottom>Background Color</Typography>
